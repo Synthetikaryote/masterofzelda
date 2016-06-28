@@ -144,10 +144,14 @@ function love.update()
 end
 
 function love.draw()
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..char.p[1]..", "..char.p[2]..", aniDir "..char.aniDir.." frame "..char.aniFrame, 400, 300)
 
     map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     map:draw()
+
+    local joystick = love.joystick.getJoysticks()[1]
+    local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
+
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..char.p[1]..", "..char.p[2]..", aniDir "..char.aniDir.." frame "..char.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
 
     if isPaused then
         love.graphics.setFont(font72)
