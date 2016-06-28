@@ -5,6 +5,12 @@ This game project is inspired by the build system of Master Of Orion 2 and the g
 
 The name is nowhere near final.
 
+Tiles are by Zabin who freely provided them on [OpenGameArt](http://opengameart.org/users/zabin).
+
+The character sprite was mixed and matched with the [Universal LPC Spritesheet Character Generator](http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/).  See that page for licenses and credits.
+
+These graphics are not final; just in use to get things working.
+
 Building / playing
 ------------------
 
@@ -18,3 +24,5 @@ This game is written in Lua for the [LÖVE](https://love2d.org/) 2D game framewo
 }
 
 To use this in Sublime Text 3, click "Tools" -> "Build System" -> "New Build System...", replace everything in the resulting document that opens with the above, edit the path to your love executable, save in the default location as "LOVE.sublime-build", and you should be able to then use "Tools" -> "Build" to build and run.
+
+Also, don't forget to "git submodule update --init"!  STI is used for loading the map(s).
