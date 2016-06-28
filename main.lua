@@ -28,8 +28,33 @@ local isPaused = false
 local font12 = love.graphics.newFont(12)
 local font72 = love.graphics.newFont(72)
 
-local map = sti.new("alex - crown island.lua", { })
 
+function love.load()
+    map = sti.new("alex - crown island.lua", { })
+    for k, v in pairs(map.tiles) do
+        v.sx = 5
+        v.sy = 5
+    end
+
+    local spriteLayer = map.layers["Sprite Layer"]
+
+    -- update callback for custom layers
+    function spriteLayer:update(dt)
+    end
+
+    -- draw callback for custom layer
+    function spriteLayer:draw()
+        local animation = char.animations[char.animationName]
+        local quad = char.animationQuads[char.animationName][char.aniDir][char.aniFrame]
+        love.graphics.draw(char.spritesheet, quad, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5)
+    end
+
+    local worldMapLayer = map.layers["world map"]
+    function worldMapLayer:update(dt)
+        self.x = -char.p[1]
+        self.y = -char.p[2]
+    end
+end
 
 for aniName, ani in pairs(char.animations) do
     char.animationQuads[aniName] = {}
@@ -83,13 +108,15 @@ function love.update()
         char.aniFrame = (char.aniFrame + 1) % animation[2]
         char.aniLastChange = love.timer.getTime() * timeScale
     end
+
+    map:update(love.timer.getDelta() * timeScale)
 end
 
 function love.draw()
     love.graphics.print("fps "..love.timer.getFPS().." x, y "..char.p[1]..", "..char.p[2]..", aniDir "..char.aniDir.." frame "..char.aniFrame, 400, 300)
-    local animation = char.animations[char.animationName]
-    local quad = char.animationQuads[char.animationName][char.aniDir][char.aniFrame]
-    love.graphics.draw(char.spritesheet, quad, char.p[1], char.p[2])
+
+    map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    map:draw()
 
     if isPaused then
         love.graphics.setFont(font72)
