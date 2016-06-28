@@ -105,7 +105,10 @@ function love.update()
     end
 
     local joystick = love.joystick.getJoysticks()[1]
-    local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
+    local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
+    if math.abs(jx) < 0.06 then jx = 0 end
+    if math.abs(jy) < 0.07 then jy = 0 end
+    local v = joystick and {jx, jy} or {0, 0}
     local moving = false
     for k, data in pairs(dirData) do
         key, dv = data[1], data[2]
@@ -117,8 +120,9 @@ function love.update()
     end
     local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
     if len > 0 then
-        v[1] = v[1] / len * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
-        v[2] = v[2] / len * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
+        if len > 1 then v[1], v[2] = v[1] / len, v[2] / len end
+        v[1] = v[1] * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
+        v[2] = v[2] * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
         char.p[1], char.p[2] = char.p[1] + v[1], char.p[2] + v[2]
     end
 
