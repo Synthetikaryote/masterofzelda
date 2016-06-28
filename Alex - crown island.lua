@@ -64,6 +64,16 @@ return {
       encoding = "base64",
       compression = "zlib",
       data = "eJztzjEBAAAIA6AZz/6FPAyxBxKQAAAAAADA22kPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+g5eAABL"
+    },
+    {
+      type = "imagelayer",
+      name = "Sprite Layer",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      image = "",
+      properties = {}
     }
   }
 }
