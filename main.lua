@@ -104,7 +104,8 @@ function love.update()
         return
     end
 
-    local v = {0, 0}
+    local joystick = love.joystick.getJoysticks()[1]
+    local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
     local moving = false
     for k, data in pairs(dirData) do
         key, dv = data[1], data[2]
