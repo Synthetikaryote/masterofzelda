@@ -1,15 +1,15 @@
 local sti = require "sti"
 
 char = {
-    spritesheet = love.graphics.newImage("character.png"),
+    spritesheet = love.graphics.newImage("assets/character.png"),
     animations = {
         -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
-        cast={0, 7, 20, 64, 64},
-        thrust={1, 8, 20, 64, 64},
-        walk={2, 8, 18, 64, 64},
-        slash={3, 6, 20, 64, 64},
-        shoot={4, 13, 20, 64, 64},
-        polearm={5, 8, 20, 256, 256}
+        cast={0, 7, 20, 64, 64, 0, 32, 56},
+        thrust={1, 8, 20, 64, 64, 256, 32, 56},
+        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        slash={3, 6, 20, 64, 64, 768, 32, 56},
+        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+        polearm={5, 8, 30, 192, 192, 1344, 96, 120}
     },
     animationQuads = {},
     hp = 100,
@@ -20,7 +20,8 @@ char = {
     animationName = "walk",
     quad = love.graphics.newQuad(0, 0, 1, 1, 1, 1),
     p = {0, 0},
-    moveSpeed = 200
+    moveSpeed = 200,
+    attackEnds = 0
 }
 
 local timeScale = 1
@@ -30,12 +31,20 @@ local font72 = love.graphics.newFont(72)
 
 
 function love.load()
-    map = sti.new("alex - crown island.lua", { })
+    map = sti.new("assets/maps/savageland.lua", { })
     for k, v in pairs(map.tiles) do
         v.sx = 5
         v.sy = 5
     end
 
+    for k, layer in pairs(map.layers) do
+        function layer:update(dt)
+            self.x = -char.p[1]
+            self.y = -char.p[2]
+        end
+    end
+
+    map:addCustomLayer("Sprite Layer", 3)
     local spriteLayer = map.layers["Sprite Layer"]
 
     -- update callback for custom layers
@@ -46,13 +55,7 @@ function love.load()
     function spriteLayer:draw()
         local animation = char.animations[char.animationName]
         local quad = char.animationQuads[char.animationName][char.aniDir][char.aniFrame]
-        love.graphics.draw(char.spritesheet, quad, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5)
-    end
-
-    local worldMapLayer = map.layers["world map"]
-    function worldMapLayer:update(dt)
-        self.x = -char.p[1]
-        self.y = -char.p[2]
+        love.graphics.draw(char.spritesheet, quad, love.graphics.getWidth() * 0.5 - animation[7], love.graphics.getHeight() * 0.5 - animation[8])
     end
 end
 
@@ -61,7 +64,7 @@ for aniName, ani in pairs(char.animations) do
     for dir = 1, 4 do
         char.animationQuads[aniName][dir] = {}
         for i=0, ani[2]-1 do
-            local quad = love.graphics.newQuad(i * ani[4], (ani[1] * 4 + dir - 1) * ani[5], ani[4], ani[5], char.spritesheet:getDimensions())
+            local quad = love.graphics.newQuad(i * ani[4], ani[6] + (dir - 1) * ani[5], ani[4], ani[5], char.spritesheet:getDimensions())
             char.animationQuads[aniName][dir][i] = quad
         end
     end
@@ -76,6 +79,17 @@ function love.keypressed(key, scancode, isRepeat)
     if scancode == "pause" then
         isPaused = not isPaused
         timeScale = isPaused and 0 or 1
+    end
+
+    if isPaused then
+        return
+    end
+
+    if scancode == "space" then
+        char.animationName = "polearm"
+        local animation = char.animations[char.animationName]
+        local aniDuration = animation[2] * (1 / animation[3])
+        char.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
     end
 end
 
@@ -105,15 +119,22 @@ function love.update()
         char.p[1], char.p[2] = char.p[1] + v[1], char.p[2] + v[2]
     end
 
-    if moving then
+    if love.timer.getTime() * timeScale <= char.attackEnds then
+        local animation = char.animations[char.animationName]
+        if love.timer.getTime() * timeScale - char.aniLastChange > 1 / animation[3] then
+            char.aniFrame = (char.aniFrame + 1) % animation[2]
+            char.aniLastChange = love.timer.getTime() * timeScale
+        end
+    elseif moving then
+        char.animationName = "walk"
         local animation = char.animations[char.animationName]
         if love.timer.getTime() * timeScale - char.aniLastChange > 1 / animation[3] then
             char.aniFrame = (char.aniFrame + 1) % animation[2]
             char.aniLastChange = love.timer.getTime() * timeScale
         end
     else
+        char.animationName = "walk"
         char.aniFrame = 0
-        char.aniLastChange = love.timer.getTime() * timeScale
     end
 
     map:update(love.timer.getDelta() * timeScale)
