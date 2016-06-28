@@ -46,7 +46,7 @@ function love.load()
         end
     end
 
-    map:addCustomLayer("Sprite Layer", 3)
+    map:addCustomLayer("Sprite Layer", 6)
     local spriteLayer = map.layers["Sprite Layer"]
 
     -- update callback for custom layers
@@ -116,8 +116,8 @@ function love.update()
     end
     local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
     if len > 0 then
-        v[1] = v[1] / len * char.moveSpeed * love.timer.getDelta() * timeScale
-        v[2] = v[2] / len * char.moveSpeed * love.timer.getDelta() * timeScale
+        v[1] = v[1] / len * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
+        v[2] = v[2] / len * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
         char.p[1], char.p[2] = char.p[1] + v[1], char.p[2] + v[2]
     end
 
