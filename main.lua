@@ -23,6 +23,14 @@ char = {
     moveSpeed = 2000
 }
 
+local timeScale = 1
+local isPaused = false
+local font12 = love.graphics.newFont(12)
+local font72 = love.graphics.newFont(72)
+
+local map = sti.new("alex - crown island.lua", { })
+
+
 for aniName, ani in pairs(char.animations) do
     char.animationQuads[aniName] = {}
     for dir = 1, 4 do
@@ -39,10 +47,22 @@ dirData = {{"up", {0, -1}},
         {"down", {0, 1}},
         {"right", {1, 0}}}
 
+function love.keypressed(key, scancode, isRepeat)
+    if scancode == "pause" then
+        isPaused = not isPaused
+        timeScale = isPaused and 0 or 1
+    end
+end
+
 function love.update()
     if love.keyboard.isScancodeDown("escape") then
         love.event.quit()
     end
+
+    if isPaused then
+        return
+    end
+
     v = {0, 0}
     for k, data in pairs(dirData) do
         key, dv = data[1], data[2]
@@ -53,15 +73,15 @@ function love.update()
     end
     local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
     if len > 0 then
-        v[1] = v[1] / len * char.moveSpeed * love.timer.getDelta()
-        v[2] = v[2] / len * char.moveSpeed * love.timer.getDelta()
+        v[1] = v[1] / len * char.moveSpeed * love.timer.getDelta() * timeScale
+        v[2] = v[2] / len * char.moveSpeed * love.timer.getDelta() * timeScale
         char.p[1], char.p[2] = char.p[1] + v[1], char.p[2] + v[2]
     end
 
     local animation = char.animations[char.animationName]
-    if love.timer.getTime() - char.aniLastChange > 1/animation[3] then
+    if love.timer.getTime() * timeScale - char.aniLastChange > 1 / animation[3] then
         char.aniFrame = (char.aniFrame + 1) % animation[2]
-        char.aniLastChange = love.timer.getTime()
+        char.aniLastChange = love.timer.getTime() * timeScale
     end
 end
 
@@ -70,6 +90,13 @@ function love.draw()
     local animation = char.animations[char.animationName]
     local quad = char.animationQuads[char.animationName][char.aniDir][char.aniFrame]
     love.graphics.draw(char.spritesheet, quad, char.p[1], char.p[2])
+
+    if isPaused then
+        love.graphics.setFont(font72)
+        local message = "paused"
+        love.graphics.printf(message, 0, (love.graphics.getHeight() - font72:getHeight(message)) * 0.5, love.graphics.getWidth(), "center")
+        love.graphics.setFont(font12)
+    end
 
     -- print_r(char.animationQuads, 800, -2600)
 end
