@@ -18,7 +18,7 @@ return {
       tileheight = 16,
       spacing = 0,
       margin = 0,
-      image = "../../../../tools/tiled/examples/sygma_dwtileset2.png",
+      image = "sygma_dwtileset2.png",
       imagewidth = 480,
       imageheight = 256,
       transparentcolor = "#ff799b",
