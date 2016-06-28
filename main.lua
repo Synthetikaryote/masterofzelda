@@ -19,8 +19,8 @@ char = {
     aniLastChange = 0,
     animationName = "walk",
     quad = love.graphics.newQuad(0, 0, 1, 1, 1, 1),
-    p = {love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5},
-    moveSpeed = 2000
+    p = {0, 0},
+    moveSpeed = 200
 }
 
 local timeScale = 1
@@ -88,12 +88,14 @@ function love.update()
         return
     end
 
-    v = {0, 0}
+    local v = {0, 0}
+    local moving = false
     for k, data in pairs(dirData) do
         key, dv = data[1], data[2]
         if love.keyboard.isScancodeDown(key) then
             v[1], v[2] = v[1] + dv[1], v[2] + dv[2]
             char.aniDir = k
+            moving = true
         end
     end
     local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
@@ -103,9 +105,14 @@ function love.update()
         char.p[1], char.p[2] = char.p[1] + v[1], char.p[2] + v[2]
     end
 
-    local animation = char.animations[char.animationName]
-    if love.timer.getTime() * timeScale - char.aniLastChange > 1 / animation[3] then
-        char.aniFrame = (char.aniFrame + 1) % animation[2]
+    if moving then
+        local animation = char.animations[char.animationName]
+        if love.timer.getTime() * timeScale - char.aniLastChange > 1 / animation[3] then
+            char.aniFrame = (char.aniFrame + 1) % animation[2]
+            char.aniLastChange = love.timer.getTime() * timeScale
+        end
+    else
+        char.aniFrame = 0
         char.aniLastChange = love.timer.getTime() * timeScale
     end
 
