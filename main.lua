@@ -114,12 +114,13 @@ function love.update()
         key, dv = data[1], data[2]
         if love.keyboard.isScancodeDown(key) then
             v[1], v[2] = v[1] + dv[1], v[2] + dv[2]
-            char.aniDir = k
-            moving = true
         end
     end
     local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
     if len > 0 then
+        moving = true
+        -- vector direction converted to an angle and mapped to the directions in the sprite
+        char.aniDir = math.max(1, math.ceil((math.atan2(v[2], -v[1]) + 2) * 0.667 + 0.00001))
         if len > 1 then v[1], v[2] = v[1] / len, v[2] / len end
         v[1] = v[1] * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
         v[2] = v[2] * char.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
