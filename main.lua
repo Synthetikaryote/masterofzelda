@@ -3,12 +3,30 @@ local sti = require "sti"
 
 -- character sprite sheet is from http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#?sex=female&body=light&eyes=green&nose=none&ears=none&legs=none&clothes=gown&gown-underdress=1&gown-overskirt=0&gown-blue-vest=0&mail=none&armor=none&jacket=none&hair=princess_blonde&hairsara-bottomlayer=0&hairsara-shadow=0&hairsara-toplayer=0&arms=none&shoulders=none&bracers=none&greaves=none&gloves=none&hat=none&hats=tiara_purple&shoes=none&belt=none&buckle=none&necklace=none&cape=none&capeacc=none&weapon=dragonspear&ammo=none&quiver=none
 
+Vector = class()
+function Vector:init(x, y)
+    self.x = x
+    self.y = y
+end
+function Vector:__add(o)
+    return Vector(self.x + o.x, self.y + o.y)
+end
+function Vector:__sub(o)
+    return Vector(self.x - o.x, self.y - o.y)
+end
+function Vector:__mul(o)
+    return Vector(self.x * o, self.y * o)
+end
+function Vector:__div(o)
+    return Vector(self.x / o, self.y / o)
+end
+
 local timeScale = 1
 local isPaused = false
 local font12 = love.graphics.newFont(12)
 local font72 = love.graphics.newFont(72)
 local characters = {}
-local mapP = {0, 0}
+local mapP = Vector(0, 0)
 
 Character = class()
 function Character:init(spritesheet, animations, hp, moveSpeed)
@@ -27,12 +45,12 @@ function Character:init(spritesheet, animations, hp, moveSpeed)
             end
         end
     end
-    self.dir = {1, 0}
+    self.dir = Vector(1, 0)
     self.aniDir = 4
     self.aniFrame = 0
     self.aniLastChange = 0
     self.animationName = select(1, next(self.animations))
-    self.p = {0, 0}
+    self.p = Vector(0, 0)
     self.attackEnds = 0
 end
 function Character:update()
@@ -45,7 +63,7 @@ end
 function Character:draw()
     local animation = self.animations[self.animationName]
     local quad = self.animationQuads[self.animationName][self.aniDir][self.aniFrame]
-    love.graphics.draw(self.spritesheet, quad, mapP[1] + self.p[1] - animation[7], mapP[2] + self.p[2] - animation[8])
+    love.graphics.draw(self.spritesheet, quad, mapP.x + self.p.x - animation[7], mapP.y + self.p.y - animation[8])
 end
 
 
@@ -55,23 +73,22 @@ function Player:update()
     local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
     if math.abs(jx) < 0.06 then jx = 0 end
     if math.abs(jy) < 0.07 then jy = 0 end
-    local v = joystick and {jx, jy} or {0, 0}
+    local v = joystick and Vector(jx, jy) or Vector(0, 0)
     local moving = false
     for k, data in pairs(dirData) do
-        key, dv = data[1], data[2]
+        local key, dv = data[1], data[2]
         if love.keyboard.isScancodeDown(key) then
-            v[1], v[2] = v[1] + dv[1], v[2] + dv[2]
+            v = v + dv
         end
     end
-    local len = math.sqrt(v[1] * v[1] + v[2] * v[2])
+    local len = math.sqrt(v.x * v.x + v.y * v.y)
     if len > 0 then
         moving = true
         -- vector direction converted to an angle and mapped to the directions in the sprite
-        self.aniDir = math.max(1, math.ceil((math.atan2(v[2], -v[1]) + 2) * 0.667 + 0.00001))
-        if len > 1 then v[1], v[2] = v[1] / len, v[2] / len end
-        v[1] = v[1] * self.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
-        v[2] = v[2] * self.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
-        self.p[1], self.p[2] = self.p[1] + v[1], self.p[2] + v[2]
+        self.aniDir = math.max(1, math.ceil((math.atan2(v.y, -v.x) + 2) * 0.667 + 0.00001))
+        if len > 1 then v = v / len end
+        v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
+        self.p = self.p + v
     end
 
     if love.timer.getTime() * timeScale <= self.attackEnds then
@@ -100,6 +117,8 @@ end
 
 Enemy = class(Character)
 function Enemy:update()
+    self.animationName = "walk"
+
     Character.update(self)
 end
 function Enemy:draw()
@@ -116,7 +135,7 @@ function love.load()
             shoot={4, 13, 20, 64, 64, 1024, 32, 56},
             polearm={5, 8, 30, 192, 192, 1344, 96, 120}
         }, 100, 200)
-    player.p = {1000, 1000}
+    player.p = Vector(1000, 1000)
     table.insert(characters, player)
 
     orc = Enemy(love.graphics.newImage("assets/orc.png"), {
@@ -138,17 +157,19 @@ function love.load()
 
     for k, layer in pairs(map.layers) do
         function layer:update(dt)
-            mapP[1] = -player.p[1] + love.graphics.getWidth() * 0.5
-            mapP[2] = -player.p[2] + love.graphics.getHeight() * 0.5
-            self.x = mapP[1]
-            self.y = mapP[2]
+            mapP.x = -player.p.x + love.graphics.getWidth() * 0.5
+            mapP.y = -player.p.y + love.graphics.getHeight() * 0.5
+            self.x = mapP.x
+            self.y = mapP.y
         end
     end
 
-    dirData = {{"up", {0, -1}},
-            {"left", {-1, 0}},
-            {"down", {0, 1}},
-            {"right", {1, 0}}}
+    dirData = {
+        {"up", Vector(0, -1)},
+        {"left", Vector(-1, 0)},
+        {"down", Vector(0, 1)},
+        {"right", Vector(1, 0)}
+    }
 
     map:addCustomLayer("Sprite Layer", 6)
     local spriteLayer = map.layers["Sprite Layer"]
@@ -159,6 +180,8 @@ function love.load()
 
     -- draw callback for custom layer
     function spriteLayer:draw()
+        -- sort by y value
+        table.sort(characters, function(a, b) return a.p.y < b.p.y end)
         for k, v in pairs(characters) do
             v:draw()
         end
@@ -202,7 +225,7 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p[1]..", "..player.p[2]..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
 
     if isPaused then
         love.graphics.setFont(font72)
