@@ -35,7 +35,7 @@ local font72 = love.graphics.newFont(72)
 
 function love.load()
     player = Character(love.graphics.newImage("assets/character.png"), {
-            -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
+            -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
             cast={0, 7, 20, 64, 64, 0, 32, 56},
             thrust={1, 8, 20, 64, 64, 256, 32, 56},
             walk={2, 8, 18, 64, 64, 512, 32, 56},
