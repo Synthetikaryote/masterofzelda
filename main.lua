@@ -173,17 +173,20 @@ function love.load()
     player.p = Vector(1000, 1000)
     table.insert(characters, player)
 
-    orc = Enemy(love.graphics.newImage("assets/orc.png"), {
-            -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
-            cast={0, 7, 20, 64, 64, 0, 32, 56},
-            thrust={1, 8, 20, 64, 64, 256, 32, 56},
-            walk={2, 8, 18, 64, 64, 512, 32, 56},
-            slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
-            shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-            attack={5, 6, 10, 192, 192, 1344, 96, 120}
-        }, 100, 100)
-    orc.p = Vector(1600, 1200)
-    table.insert(characters, orc)
+    local numOrcs = 100
+    for i=1,numOrcs do
+        orc = Enemy(love.graphics.newImage("assets/orc.png"), {
+                -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
+                cast={0, 7, 20, 64, 64, 0, 32, 56},
+                thrust={1, 8, 20, 64, 64, 256, 32, 56},
+                walk={2, 8, 18, 64, 64, 512, 32, 56},
+                slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
+                shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+                attack={5, 6, 10, 192, 192, 1344, 96, 120}
+            }, 100, 100)
+        orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
+        table.insert(characters, orc)
+    end
 
     map = sti.new("assets/maps/savageland.lua", { })
     for k, v in pairs(map.tiles) do
