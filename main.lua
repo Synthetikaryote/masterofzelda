@@ -10,6 +10,7 @@ local font12 = love.graphics.newFont(12)
 local font72 = love.graphics.newFont(72)
 local characters = {}
 local mapP = Vector(0, 0)
+local keyboard = {}
 
 Sprite = class()
 function Sprite:init(filename, animations)
@@ -49,9 +50,14 @@ function Character:update()
     end
 end
 function Character:draw()
+    
     local animation = self.sprite.animations[self.animationName]
     local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
-    love.graphics.draw(self.sprite.spritesheet, quad, mapP.x + self.p.x - animation[7], mapP.y + self.p.y - animation[8])
+    local screenX = mapP.x + self.p.x - animation[7]
+    local screenY = mapP.y + self.p.y - animation[8]
+    if screenX >= 0 and screenX < love.graphics.getWidth() and screenY >= 0 and screenY < love.graphics.getHeight() then
+        love.graphics.draw(self.sprite.spritesheet, quad, screenX, screenY)
+    end
 end
 
 
@@ -65,7 +71,7 @@ function Player:update()
     local moving = false
     for k, data in pairs(dirData) do
         local key, dv = data[1], data[2]
-        if love.keyboard.isScancodeDown(key) then
+        if keyboard[key] then
             v = v + dv
         end
     end
@@ -162,7 +168,7 @@ function love.load()
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         attack={5, 6, 10, 192, 192, 1344, 96, 120}
     })
-    local numOrcs = 1000
+    local numOrcs = 10000
     for i=1,numOrcs do
         orc = Enemy(orcSprite, 100, 100)
         orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
@@ -209,6 +215,8 @@ function love.load()
 end
 
 function love.keypressed(key, scancode, isRepeat)
+    keyboard[scancode] = 1
+
     if scancode == "pause" then
         isPaused = not isPaused
         timeScale = isPaused and 0 or 1
@@ -219,6 +227,10 @@ function love.keypressed(key, scancode, isRepeat)
     end
 
     player:keypressed(key, scancode, isRepeat)
+end
+
+function love.keyreleased(key, scancode, isRepeat)
+    keyboard[scancode] = nil
 end
 
 function love.update()
@@ -246,6 +258,7 @@ function love.draw()
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
     love.graphics.print("fps "..love.timer.getFPS().." x, y "..orc.p.x..", "..orc.p.y..", aniDir "..orc.aniDir.." frame "..orc.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
+    print_r(keyboard, 0, 0)
 
     if isPaused then
         love.graphics.setFont(font72)
