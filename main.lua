@@ -11,11 +11,13 @@ local font72 = love.graphics.newFont(72)
 local characters = {}
 local mapP = Vector(0, 0)
 local keyboard = {}
-local yMap = {}
+local xyMap = {}
 -- to prevent sprites from being culled near the top of the screen,
 -- this keeps track of the biggest offset to render at the top
 -- essentially the biggest y pivot of all sprites
+local leftXOffset = 0
 local topYOffset = 0
+local xyMapXWidth = 1920 --love.graphics.getWidth() * 100
 
 Sprite = class()
 function Sprite:init(filename, animations)
@@ -32,9 +34,8 @@ function Sprite:init(filename, animations)
             end
         end
 
-        if ani[8] > topYOffset then
-            topYOffset = ani[8]
-        end
+        leftXOffset = math.max(ani[7], leftXOffset)
+        topYOffset = math.max(ani[8], topYOffset)
     end
 end
 
@@ -51,7 +52,7 @@ function Character:init(id, sprite, hp, moveSpeed)
     self.dir = Vector(1, 0)
     self.p = Vector(0, 0)
     self.attackEnds = 0
-    self.yMapY = 0
+    self.xyMapP = Vector(0, 0)
 end
 function Character:update()
     local animation = self.sprite.animations[self.animationName]
@@ -71,20 +72,25 @@ function Character:draw()
         love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY)
     end
 end
-local failedRemoves = 0
 function Character:move(p)
     self.p = p
     local animation = self.sprite.animations[self.animationName]
+    local x = math.floor((p.x - animation[7]) / xyMapXWidth)
     local y = math.floor(p.y - animation[8])
-    if self.yMapY ~= y then
-        if yMap[self.yMapY] ~= nil then
-            yMap[self.yMapY][self.id] = nil
+    if self.xyMapP.x ~= x or self.xyMapP.y ~= y then
+        if xyMap[self.xyMapP.y] ~= nil then
+            if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
+                xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
+            end
         end
-        self.yMapY = y
-        if yMap[y] == nil then
-            yMap[y] = {}
+        self.xyMapP = Vector(x, y)
+        if xyMap[y] == nil then
+            xyMap[y] = {}
         end
-        yMap[y][self.id] = self
+        if xyMap[y][x] == nil then
+            xyMap[y][x] = {}
+        end
+        xyMap[y][x][self.id] = self
     end
 end
 
@@ -172,6 +178,7 @@ function Enemy:draw()
     Character.draw(self)
 end
 
+local numVisited = 0
 function love.load()
     map = sti.new("assets/maps/savageland.lua", { })
     for k, v in pairs(map.tiles) do
@@ -197,12 +204,20 @@ function love.load()
 
     -- draw callback for custom layer
     function spriteLayer:draw()
+        numVisited = 0
         local topY = math.floor(-mapP.y - topYOffset)
         local bottomY = math.floor(-mapP.y + love.graphics.getHeight())
+        local leftX = math.floor((-mapP.x - leftXOffset) / xyMapXWidth)
+        local rightX = math.floor((-mapP.x + love.graphics.getWidth()) / xyMapXWidth)
         for y = topY, bottomY do
-            if yMap[y] then
-                for k, v in pairs(yMap[y]) do
-                    v:draw()
+            if xyMap[y] then
+                for x = leftX, rightX do
+                    if xyMap[y][x] then
+                        for k, v in pairs(xyMap[y][x]) do
+                            numVisited = numVisited + 1
+                            v:draw()
+                        end
+                    end
                 end
             end
         end
@@ -233,7 +248,7 @@ function love.load()
     local numOrcs = 100000
     for i=1,numOrcs do
         orc = Enemy("orc"..i, orcSprite, 100, 100)
-        orc:move(Vector(math.random(0, 10000), math.random(0, 10000)))
+        orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
         table.insert(characters, orc)
     end
 
@@ -286,7 +301,7 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "").."\nnumVisited "..numVisited, 400, 300)
 
     if isPaused then
         love.graphics.setFont(font72)
