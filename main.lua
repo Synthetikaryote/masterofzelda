@@ -12,12 +12,18 @@ local characters = {}
 local mapP = Vector(0, 0)
 local keyboard = {}
 local xyMap = {}
--- to prevent sprites from being culled near the top of the screen,
--- this keeps track of the biggest offset to render at the top
--- essentially the biggest y pivot of all sprites
+-- to prevent sprites from being culled near the edges of the screen,
+-- this keeps track of the biggest offset to render at the edges
+-- essentially the biggest pivot of all sprites
 local leftXOffset = 0
+local rightXOffset = 0
 local topYOffset = 0
+local bottomYOffset = 0
+local biggestPivotWidth = 0
+local biggestPivotHeight = 0
 local xyMapXWidth = love.graphics.getWidth() * 0.1
+
+local showAggro = false
 
 Sprite = class()
 function Sprite:init(filename, animations)
@@ -34,9 +40,11 @@ function Sprite:init(filename, animations)
             end
         end
 
-        leftXOffset = math.max(ani[7], leftXOffset)
-        topYOffset = math.max(ani[8], topYOffset)
+        biggestPivotWidth = math.max(biggestPivotWidth, ani[7])
+        biggestPivotHeight = math.max(biggestPivotHeight, ani[8])
     end
+    leftXOffset = math.max(leftXOffset, biggestPivotWidth)
+    topYOffset = math.max(topYOffset, biggestPivotHeight)
 end
 
 Character = class()
@@ -60,6 +68,8 @@ function Character:update()
         self.aniFrame = (self.aniFrame + 1) % animation[2]
         self.aniLastChange = love.timer.getTime() * timeScale
     end
+end
+function Character:earlyDraw()
 end
 function Character:draw()
     local animation = self.sprite.animations[self.animationName]
@@ -144,20 +154,29 @@ function Player:keypressed(key, scancode, isRepeat)
 end
 
 Enemy = class(Character)
+function Enemy:init(id, sprite, hp, moveSpeed, detectDist, attackDist)
+    Character.init(self, id, sprite, hp, moveSpeed)
+    self.detectDist = detectDist
+    self.attackDist = attackDist
+    leftXOffset = math.max(leftXOffset, detectDist + biggestPivotWidth)
+    rightXOffset = math.max(rightXOffset, detectDist)
+    topYOffset = math.max(topYOffset, detectDist + biggestPivotHeight)
+    bottomYOffset = math.max(bottomYOffset, detectDist)
+end
 function Enemy:update()
     local dx = player.p.x - self.p.x
     local dy = player.p.y - self.p.y
     local distSq = dx * dx + dy * dy
-    if distSq < 90000 then -- 300 dist
+    if distSq < self.detectDist * self.detectDist then -- 300 dist
         local dist = math.sqrt(distSq)
         local distInv = 1 / dist
         local vx = dx * distInv
         local vy = dy * distInv
         self.aniDir = math.max(1, math.ceil((math.atan2(vy, -vx) + 2) * 0.667 + 0.00001))
         local lastAniName = self.animationName
-        if dist < 50 then
+        if dist < self.attackDist then
             self.animationName = "attack"
-        elseif dist < 300 then
+        elseif dist < self.detectDist then
             self.animationName = "walk"
             local mult = self.moveSpeed * love.timer.getDelta() * timeScale
             self:move(Vector(self.p.x + vx * mult, self.p.y + vy * mult))
@@ -173,6 +192,19 @@ function Enemy:update()
 
         Character.update(self)
     end
+end
+function Enemy:earlyDraw()
+    if showAggro then
+        local animation = self.sprite.animations[self.animationName]
+        local x = mapP.x + self.p.x
+        local y = mapP.y + self.p.y
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.circle("line", x, y, self.detectDist, 40)
+        love.graphics.setColor(255, 0, 0, 50)
+        love.graphics.circle("fill", x, y, self.detectDist, 40)
+        love.graphics.setColor(255, 255, 255, 255)
+    end
+    Character.earlyDraw()
 end
 function Enemy:draw()
     Character.draw(self)
@@ -206,16 +238,22 @@ function love.load()
     function spriteLayer:draw()
         numVisited = 0
         local topY = math.floor(-mapP.y - topYOffset)
-        local bottomY = math.floor(-mapP.y + love.graphics.getHeight())
+        local bottomY = math.floor(-mapP.y + love.graphics.getHeight() + bottomYOffset)
         local leftX = math.floor((-mapP.x - leftXOffset) / xyMapXWidth)
-        local rightX = math.floor((-mapP.x + love.graphics.getWidth()) / xyMapXWidth)
-        for y = topY, bottomY do
-            if xyMap[y] then
-                for x = leftX, rightX do
-                    if xyMap[y][x] then
-                        for k, v in pairs(xyMap[y][x]) do
-                            numVisited = numVisited + 1
-                            v:draw()
+        local rightX = math.floor((-mapP.x + love.graphics.getWidth()) / xyMapXWidth + rightXOffset)
+        for i = 1, 2 do -- 2 passes: earlyDraw, draw
+            for y = topY, bottomY do
+                if xyMap[y] then
+                    for x = leftX, rightX do
+                        if xyMap[y][x] then
+                            for k, v in pairs(xyMap[y][x]) do
+                                if i == 1 then
+                                    numVisited = numVisited + 1
+                                    v:earlyDraw()
+                                elseif i == 2 then
+                                    v:draw()
+                                end
+                            end
                         end
                     end
                 end
@@ -247,7 +285,7 @@ function love.load()
     })
     local numOrcs = 400
     for i=1,numOrcs do
-        orc = Enemy("orc"..i, orcSprite, 100, 100)
+        orc = Enemy("orc"..i, orcSprite, 100, 100, 200, 50)
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
         table.insert(characters, orc)
     end
@@ -285,6 +323,9 @@ function love.update()
     if isPaused then
         return
     end
+
+    showAggro = keyboard["lctrl"] or keyboard["rctrl"]
+
 
     for k, v in pairs(characters) do
         v:update()
