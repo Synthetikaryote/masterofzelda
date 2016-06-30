@@ -168,7 +168,7 @@ function love.load()
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         attack={5, 6, 10, 192, 192, 1344, 96, 120}
     })
-    local numOrcs = 10000
+    local numOrcs = 100000
     for i=1,numOrcs do
         orc = Enemy(orcSprite, 100, 100)
         orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
