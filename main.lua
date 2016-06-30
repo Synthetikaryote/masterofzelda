@@ -45,12 +45,10 @@ local font72 = love.graphics.newFont(72)
 local characters = {}
 local mapP = Vector(0, 0)
 
-Character = class()
-function Character:init(spritesheet, animations, hp, moveSpeed)
-    self.spritesheet = spritesheet
+Sprite = class()
+function Sprite:init(filename, animations)
+    self.spritesheet = love.graphics.newImage(filename)
     self.animations = animations
-    self.hp = hp
-    self.moveSpeed = moveSpeed
     self.animationQuads = {}
     for aniName, ani in pairs(self.animations) do
         self.animationQuads[aniName] = {}
@@ -62,25 +60,32 @@ function Character:init(spritesheet, animations, hp, moveSpeed)
             end
         end
     end
-    self.dir = Vector(1, 0)
+end
+
+Character = class()
+function Character:init(sprite, hp, moveSpeed)
+    self.sprite = sprite
     self.aniDir = 4
     self.aniFrame = 0
     self.aniLastChange = 0
-    self.animationName = select(1, next(self.animations))
+    self.animationName = select(1, next(self.sprite.animations))
+    self.hp = hp
+    self.moveSpeed = moveSpeed
+    self.dir = Vector(1, 0)
     self.p = Vector(0, 0)
     self.attackEnds = 0
 end
 function Character:update()
-    local animation = self.animations[self.animationName]
+    local animation = self.sprite.animations[self.animationName]
     if love.timer.getTime() * timeScale - self.aniLastChange > 1 / animation[3] then
         self.aniFrame = (self.aniFrame + 1) % animation[2]
         self.aniLastChange = love.timer.getTime() * timeScale
     end
 end
 function Character:draw()
-    local animation = self.animations[self.animationName]
-    local quad = self.animationQuads[self.animationName][self.aniDir][self.aniFrame]
-    love.graphics.draw(self.spritesheet, quad, mapP.x + self.p.x - animation[7], mapP.y + self.p.y - animation[8])
+    local animation = self.sprite.animations[self.animationName]
+    local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
+    love.graphics.draw(self.sprite.spritesheet, quad, mapP.x + self.p.x - animation[7], mapP.y + self.p.y - animation[8])
 end
 
 
@@ -161,29 +166,31 @@ function Enemy:draw()
 end
 
 function love.load()
-    player = Player(love.graphics.newImage("assets/character.png"), {
-            -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
-            cast={0, 7, 20, 64, 64, 0, 32, 56},
-            thrust={1, 8, 20, 64, 64, 256, 32, 56},
-            walk={2, 8, 18, 64, 64, 512, 32, 56},
-            slash={3, 6, 20, 64, 64, 768, 32, 56},
-            shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-            polearm={5, 8, 30, 192, 192, 1344, 96, 120}
-        }, 100, 200)
+    local playerSprite = Sprite("assets/character.png", {
+        -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
+        cast={0, 7, 20, 64, 64, 0, 32, 56},
+        thrust={1, 8, 20, 64, 64, 256, 32, 56},
+        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        slash={3, 6, 20, 64, 64, 768, 32, 56},
+        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+        polearm={5, 8, 30, 192, 192, 1344, 96, 120}
+    })
+    player = Player(playerSprite, 100, 200)
     player.p = Vector(1000, 1000)
     table.insert(characters, player)
 
+    local orcSprite = Sprite("assets/orc.png", {
+        -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
+        cast={0, 7, 20, 64, 64, 0, 32, 56},
+        thrust={1, 8, 20, 64, 64, 256, 32, 56},
+        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
+        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+        attack={5, 6, 10, 192, 192, 1344, 96, 120}
+    })
     local numOrcs = 100
     for i=1,numOrcs do
-        orc = Enemy(love.graphics.newImage("assets/orc.png"), {
-                -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
-                cast={0, 7, 20, 64, 64, 0, 32, 56},
-                thrust={1, 8, 20, 64, 64, 256, 32, 56},
-                walk={2, 8, 18, 64, 64, 512, 32, 56},
-                slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
-                shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-                attack={5, 6, 10, 192, 192, 1344, 96, 120}
-            }, 100, 100)
+        orc = Enemy(orcSprite, 100, 100)
         orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
         table.insert(characters, orc)
     end
