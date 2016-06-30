@@ -17,7 +17,7 @@ local xyMap = {}
 -- essentially the biggest y pivot of all sprites
 local leftXOffset = 0
 local topYOffset = 0
-local xyMapXWidth = 1920 --love.graphics.getWidth() * 100
+local xyMapXWidth = love.graphics.getWidth() * 0.1
 
 Sprite = class()
 function Sprite:init(filename, animations)
@@ -115,7 +115,7 @@ function Player:update()
         -- vector direction converted to an angle and mapped to the directions in the sprite
         self.aniDir = math.max(1, math.ceil((math.atan2(v.y, -v.x) + 2) * 0.667 + 0.00001))
         if len > 1 then v = v / len end
-        v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (keyboard["lshift"] and 10 or 1)
+        v = v * self.moveSpeed * love.timer.getDelta() * timeScale * ((keyboard["lshift"] or keyboard["rshift"]) and 10 or 1)
         self:move(self.p + v)
     end
 
@@ -245,7 +245,7 @@ function love.load()
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         attack={5, 6, 10, 192, 192, 1345, 96, 119}
     })
-    local numOrcs = 100000
+    local numOrcs = 400
     for i=1,numOrcs do
         orc = Enemy("orc"..i, orcSprite, 100, 100)
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
