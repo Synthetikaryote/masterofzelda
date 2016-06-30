@@ -5,8 +5,8 @@ Player = class(Character)
 function Player:update()
     local joystick = love.joystick.getJoysticks()[1]
     local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
-    if math.abs(jx) < 0.06 then jx = 0 end
-    if math.abs(jy) < 0.07 then jy = 0 end
+    if math.abs(jx) < 0.06 then jx = 0 else jx = (jx - 0.06) / (1 - 0.06) end
+    if math.abs(jy) < 0.06 then jy = 0 else jy = (jy - 0.06) / (1 - 0.06) end
     local v = joystick and Vector(jx, jy) or Vector(0, 0)
     local moving = false
     for k, data in pairs(dirData) do
