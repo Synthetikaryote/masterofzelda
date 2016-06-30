@@ -23,6 +23,13 @@ This game is written in Lua for the [LÖVE](https://love2d.org/) 2D game framewo
 }
 ```
 
-To use this in Sublime Text 3, click "Tools" -> "Build System" -> "New Build System...", replace everything in the resulting document that opens with the above, edit the path to your love executable, save in the default location as "LOVE.sublime-build", and you should be able to then use "Tools" -> "Build" to build and run.
+To use this in Sublime Text 3, click "Tools" -> "Build System" -> "New Build System...", replace everything in the resulting document that opens with the above, edit the path to your love executable, save in the default location as "LOVE.sublime-build", and you should be able to then use "Tools" -> "Build" to build and run when you have main.lua open.
+
+Alternatively, the following batch script will build and run the game if you have it and 7za in this repo's root directory.  Edit the path to your love executable.
+
+```dos
+7za a -r -tzip masterofzelda.love *.* -xr!*.love -xr!*.bat -xr!*.exe
+"C:\tools\love\love.exe" masterofzelda.love
+```
 
 Also, don't forget to "git submodule update --init"!  STI is used for loading the map(s) made in Tiled.

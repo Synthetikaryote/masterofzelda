@@ -64,7 +64,8 @@ abilities:
 	-2 max bombs
 		-4 max bombs
 	-double radius
-	-double throwing range
+	-throw bombs
+		-double throwing range
 
 
 
