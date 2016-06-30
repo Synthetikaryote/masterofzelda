@@ -20,6 +20,23 @@ end
 function Vector:__div(o)
     return Vector(self.x / o, self.y / o)
 end
+function Vector:__unm()
+    return Vector(-self.x, -self.y)
+end
+function Vector:lenSq()
+    return self.x * self.x + self.y * self.y
+end
+function Vector:len()
+    return math.sqrt(self:lenSq())
+end
+function Vector:normalize()
+    len = self:len()
+    self = self / len
+    return len
+end
+function Vector:normalized()
+    return self / self:len()
+end
 
 local timeScale = 1
 local isPaused = false
@@ -81,7 +98,7 @@ function Player:update()
             v = v + dv
         end
     end
-    local len = math.sqrt(v.x * v.x + v.y * v.y)
+    local len = v:len()
     if len > 0 then
         moving = true
         -- vector direction converted to an angle and mapped to the directions in the sprite
@@ -106,7 +123,7 @@ end
 function Player:draw()
     Character.draw(self)
 end
-function Player:keypressed(c, key, scancode, isRepeat)
+function Player:keypressed(key, scancode, isRepeat)
     if scancode == "space" then
         self.animationName = "polearm"
         local animation = self.animations[self.animationName]
@@ -117,7 +134,25 @@ end
 
 Enemy = class(Character)
 function Enemy:update()
-    self.animationName = "walk"
+    local dp = player.p - self.p
+    local dist = dp:len()
+    local v = dp / dist
+    self.aniDir = math.max(1, math.ceil((math.atan2(v.y, -v.x) + 2) * 0.667 + 0.00001))
+    local lastAniName = self.animationName
+    if dist < 50 then
+        self.animationName = "attack"
+    elseif dist < 500 then
+        self.animationName = "walk"
+        self.p = self.p + v * self.moveSpeed * love.timer.getDelta() * timeScale
+    else
+        self.animationName = "walk"
+        self.aniFrame = 0
+        self.aniLastChange = love.timer.getTime() * timeScale
+    end
+
+    if lastAniName ~= self.animationName then
+        self.aniFrame = 0
+    end
 
     Character.update(self)
 end
@@ -143,10 +178,11 @@ function love.load()
             cast={0, 7, 20, 64, 64, 0, 32, 56},
             thrust={1, 8, 20, 64, 64, 256, 32, 56},
             walk={2, 8, 18, 64, 64, 512, 32, 56},
-            slash={3, 6, 20, 64, 64, 768, 32, 56},
+            slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
             shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-            polearm={5, 8, 30, 192, 192, 1344, 96, 120}
-        }, 100, 200)
+            attack={5, 6, 10, 192, 192, 1344, 96, 120}
+        }, 100, 100)
+    orc.p = Vector(1600, 1200)
     table.insert(characters, orc)
 
     map = sti.new("assets/maps/savageland.lua", { })
@@ -225,7 +261,7 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..orc.p.x..", "..orc.p.y..", aniDir "..orc.aniDir.." frame "..orc.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
 
     if isPaused then
         love.graphics.setFont(font72)
