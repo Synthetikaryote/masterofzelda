@@ -27,7 +27,7 @@ To use this in Sublime Text 3, click "Tools" -> "Build System" -> "New Build Sys
 
 Alternatively, the following batch script will build and run the game if you have it and 7za in this repo's root directory.  Edit the path to your love executable.
 
-```dos
+```batch
 7za a -r -tzip masterofzelda.love *.* -xr!*.love -xr!*.bat -xr!*.exe
 "C:\tools\love\love.exe" masterofzelda.love
 ```
