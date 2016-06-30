@@ -1,42 +1,8 @@
 require "class"
+require "Vector"
 local sti = require "sti"
 
 -- character sprite sheet is from http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#?sex=female&body=light&eyes=green&nose=none&ears=none&legs=none&clothes=gown&gown-underdress=1&gown-overskirt=0&gown-blue-vest=0&mail=none&armor=none&jacket=none&hair=princess_blonde&hairsara-bottomlayer=0&hairsara-shadow=0&hairsara-toplayer=0&arms=none&shoulders=none&bracers=none&greaves=none&gloves=none&hat=none&hats=tiara_purple&shoes=none&belt=none&buckle=none&necklace=none&cape=none&capeacc=none&weapon=dragonspear&ammo=none&quiver=none
-
-Vector = class()
-function Vector:init(x, y)
-    self.x = x
-    self.y = y
-end
-function Vector:__add(o)
-    return Vector(self.x + o.x, self.y + o.y)
-end
-function Vector:__sub(o)
-    return Vector(self.x - o.x, self.y - o.y)
-end
-function Vector:__mul(o)
-    return Vector(self.x * o, self.y * o)
-end
-function Vector:__div(o)
-    return Vector(self.x / o, self.y / o)
-end
-function Vector:__unm()
-    return Vector(-self.x, -self.y)
-end
-function Vector:lenSq()
-    return self.x * self.x + self.y * self.y
-end
-function Vector:len()
-    return math.sqrt(self:lenSq())
-end
-function Vector:normalize()
-    len = self:len()
-    self = self / len
-    return len
-end
-function Vector:normalized()
-    return self / self:len()
-end
 
 local timeScale = 1
 local isPaused = false
@@ -131,7 +97,7 @@ end
 function Player:keypressed(key, scancode, isRepeat)
     if scancode == "space" then
         self.animationName = "polearm"
-        local animation = self.animations[self.animationName]
+        local animation = self.sprite.animations[self.animationName]
         local aniDuration = animation[2] * (1 / animation[3])
         self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
     end
@@ -139,27 +105,35 @@ end
 
 Enemy = class(Character)
 function Enemy:update()
-    local dp = player.p - self.p
-    local dist = dp:len()
-    local v = dp / dist
-    self.aniDir = math.max(1, math.ceil((math.atan2(v.y, -v.x) + 2) * 0.667 + 0.00001))
-    local lastAniName = self.animationName
-    if dist < 50 then
-        self.animationName = "attack"
-    elseif dist < 500 then
-        self.animationName = "walk"
-        self.p = self.p + v * self.moveSpeed * love.timer.getDelta() * timeScale
-    else
-        self.animationName = "walk"
-        self.aniFrame = 0
-        self.aniLastChange = love.timer.getTime() * timeScale
-    end
+    local dx = player.p.x - self.p.x
+    local dy = player.p.y - self.p.y
+    local distSq = dx * dx + dy * dy
+    if distSq < 90000 then -- 300 dist
+        local dist = math.sqrt(distSq)
+        local distInv = 1 / dist
+        local vx = dx * distInv
+        local vy = dy * distInv
+        self.aniDir = math.max(1, math.ceil((math.atan2(vy, -vx) + 2) * 0.667 + 0.00001))
+        local lastAniName = self.animationName
+        if dist < 50 then
+            self.animationName = "attack"
+        elseif dist < 300 then
+            self.animationName = "walk"
+            local mult = self.moveSpeed * love.timer.getDelta() * timeScale
+            self.p.x = self.p.x + vx * mult
+            self.p.y = self.p.y + vy * mult
+        else
+            self.animationName = "walk"
+            self.aniFrame = 0
+            self.aniLastChange = love.timer.getTime() * timeScale
+        end
 
-    if lastAniName ~= self.animationName then
-        self.aniFrame = 0
-    end
+        if lastAniName ~= self.animationName then
+            self.aniFrame = 0
+        end
 
-    Character.update(self)
+        Character.update(self)
+    end
 end
 function Enemy:draw()
     Character.draw(self)
@@ -188,7 +162,7 @@ function love.load()
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         attack={5, 6, 10, 192, 192, 1344, 96, 120}
     })
-    local numOrcs = 100
+    local numOrcs = 1000
     for i=1,numOrcs do
         orc = Enemy(orcSprite, 100, 100)
         orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
