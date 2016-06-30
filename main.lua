@@ -11,6 +11,11 @@ local font72 = love.graphics.newFont(72)
 local characters = {}
 local mapP = Vector(0, 0)
 local keyboard = {}
+local yMap = {}
+-- to prevent sprites from being culled near the top of the screen,
+-- this keeps track of the biggest offset to render at the top
+-- essentially the biggest y pivot of all sprites
+local topYOffset = 0
 
 Sprite = class()
 function Sprite:init(filename, animations)
@@ -26,11 +31,16 @@ function Sprite:init(filename, animations)
                 self.animationQuads[aniName][dir][i] = quad
             end
         end
+
+        if ani[8] > topYOffset then
+            topYOffset = ani[8]
+        end
     end
 end
 
 Character = class()
-function Character:init(sprite, hp, moveSpeed)
+function Character:init(id, sprite, hp, moveSpeed)
+    self.id = id
     self.sprite = sprite
     self.aniDir = 4
     self.aniFrame = 0
@@ -41,6 +51,7 @@ function Character:init(sprite, hp, moveSpeed)
     self.dir = Vector(1, 0)
     self.p = Vector(0, 0)
     self.attackEnds = 0
+    self.yMapY = 0
 end
 function Character:update()
     local animation = self.sprite.animations[self.animationName]
@@ -50,13 +61,30 @@ function Character:update()
     end
 end
 function Character:draw()
-    
     local animation = self.sprite.animations[self.animationName]
-    local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
-    local screenX = mapP.x + self.p.x - animation[7]
-    local screenY = mapP.y + self.p.y - animation[8]
-    if screenX >= 0 and screenX < love.graphics.getWidth() and screenY >= 0 and screenY < love.graphics.getHeight() then
-        love.graphics.draw(self.sprite.spritesheet, quad, screenX, screenY)
+    local leftX = mapP.x + self.p.x - animation[7]
+    local rightX = leftX + animation[4]
+    local topY = mapP.y + self.p.y - animation[8]
+    local bottomY = topY + animation[5]
+    if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
+        local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
+        love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY)
+    end
+end
+local failedRemoves = 0
+function Character:move(p)
+    self.p = p
+    local animation = self.sprite.animations[self.animationName]
+    local y = math.floor(p.y - animation[8])
+    if self.yMapY ~= y then
+        if yMap[self.yMapY] ~= nil then
+            yMap[self.yMapY][self.id] = nil
+        end
+        self.yMapY = y
+        if yMap[y] == nil then
+            yMap[y] = {}
+        end
+        yMap[y][self.id] = self
     end
 end
 
@@ -81,8 +109,8 @@ function Player:update()
         -- vector direction converted to an angle and mapped to the directions in the sprite
         self.aniDir = math.max(1, math.ceil((math.atan2(v.y, -v.x) + 2) * 0.667 + 0.00001))
         if len > 1 then v = v / len end
-        v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (love.keyboard.isScancodeDown("lshift") and 10 or 1)
-        self.p = self.p + v
+        v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (keyboard["lshift"] and 10 or 1)
+        self:move(self.p + v)
     end
 
     if love.timer.getTime() * timeScale <= self.attackEnds then
@@ -126,8 +154,7 @@ function Enemy:update()
         elseif dist < 300 then
             self.animationName = "walk"
             local mult = self.moveSpeed * love.timer.getDelta() * timeScale
-            self.p.x = self.p.x + vx * mult
-            self.p.y = self.p.y + vy * mult
+            self:move(Vector(self.p.x + vx * mult, self.p.y + vy * mult))
         else
             self.animationName = "walk"
             self.aniFrame = 0
@@ -146,35 +173,6 @@ function Enemy:draw()
 end
 
 function love.load()
-    local playerSprite = Sprite("assets/character.png", {
-        -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
-        cast={0, 7, 20, 64, 64, 0, 32, 56},
-        thrust={1, 8, 20, 64, 64, 256, 32, 56},
-        walk={2, 8, 18, 64, 64, 512, 32, 56},
-        slash={3, 6, 20, 64, 64, 768, 32, 56},
-        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-        polearm={5, 8, 30, 192, 192, 1344, 96, 120}
-    })
-    player = Player(playerSprite, 100, 200)
-    player.p = Vector(1000, 1000)
-    table.insert(characters, player)
-
-    local orcSprite = Sprite("assets/orc.png", {
-        -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
-        cast={0, 7, 20, 64, 64, 0, 32, 56},
-        thrust={1, 8, 20, 64, 64, 256, 32, 56},
-        walk={2, 8, 18, 64, 64, 512, 32, 56},
-        slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
-        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-        attack={5, 6, 10, 192, 192, 1344, 96, 120}
-    })
-    local numOrcs = 100000
-    for i=1,numOrcs do
-        orc = Enemy(orcSprite, 100, 100)
-        orc.p = Vector(math.random(0, 10000), math.random(0, 10000))
-        table.insert(characters, orc)
-    end
-
     map = sti.new("assets/maps/savageland.lua", { })
     for k, v in pairs(map.tiles) do
         v.sx = 5
@@ -190,13 +188,6 @@ function love.load()
         end
     end
 
-    dirData = {
-        {"up", Vector(0, -1)},
-        {"left", Vector(-1, 0)},
-        {"down", Vector(0, 1)},
-        {"right", Vector(1, 0)}
-    }
-
     map:addCustomLayer("Sprite Layer", 6)
     local spriteLayer = map.layers["Sprite Layer"]
 
@@ -206,18 +197,60 @@ function love.load()
 
     -- draw callback for custom layer
     function spriteLayer:draw()
-        -- sort by y value
-        table.sort(characters, function(a, b) return a.p.y < b.p.y end)
-        for k, v in pairs(characters) do
-            v:draw()
+        local topY = math.floor(-mapP.y - topYOffset)
+        local bottomY = math.floor(-mapP.y + love.graphics.getHeight())
+        for y = topY, bottomY do
+            if yMap[y] then
+                for k, v in pairs(yMap[y]) do
+                    v:draw()
+                end
+            end
         end
     end
+
+    local playerSprite = Sprite("assets/character.png", {
+        -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
+        cast={0, 7, 20, 64, 64, 0, 32, 56},
+        thrust={1, 8, 20, 64, 64, 256, 32, 56},
+        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        slash={3, 6, 20, 64, 64, 768, 32, 56},
+        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+        polearm={5, 8, 30, 192, 192, 1345, 96, 119}
+    })
+    player = Player("player", playerSprite, 100, 200)
+    player:move(Vector(0, 0))
+    table.insert(characters, player)
+
+    local orcSprite = Sprite("assets/orc.png", {
+        -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
+        cast={0, 7, 20, 64, 64, 0, 32, 56},
+        thrust={1, 8, 20, 64, 64, 256, 32, 56},
+        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
+        shoot={4, 13, 20, 64, 64, 1024, 32, 56},
+        attack={5, 6, 10, 192, 192, 1345, 96, 119}
+    })
+    local numOrcs = 100000
+    for i=1,numOrcs do
+        orc = Enemy("orc"..i, orcSprite, 100, 100)
+        orc:move(Vector(math.random(0, 10000), math.random(0, 10000)))
+        table.insert(characters, orc)
+    end
+
+    dirData = {
+        {"up", Vector(0, -1)},
+        {"left", Vector(-1, 0)},
+        {"down", Vector(0, 1)},
+        {"right", Vector(1, 0)}
+    }
 end
 
 function love.keypressed(key, scancode, isRepeat)
     keyboard[scancode] = 1
 
-    if scancode == "pause" then
+    if scancode == "escape" then
+        love.event.quit()
+    elseif scancode == "pause" then
         isPaused = not isPaused
         timeScale = isPaused and 0 or 1
     end
@@ -234,10 +267,6 @@ function love.keyreleased(key, scancode, isRepeat)
 end
 
 function love.update()
-    if love.keyboard.isScancodeDown("escape") then
-        love.event.quit()
-    end
-
     if isPaused then
         return
     end
@@ -257,8 +286,7 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..orc.p.x..", "..orc.p.y..", aniDir "..orc.aniDir.." frame "..orc.aniFrame..(joystick and " joystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
-    print_r(keyboard, 0, 0)
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or ""), 400, 300)
 
     if isPaused then
         love.graphics.setFont(font72)
