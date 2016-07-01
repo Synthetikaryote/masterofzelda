@@ -24,8 +24,10 @@ function Player:update()
     if len > 0 then
         moving = true
         -- vector direction converted to an angle and mapped to the directions in the sprite
-        self.facingDir = math.atan2(v.y, v.x)
-        self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
+        if self.animationName ~= "polearm" then
+            self.facingDir = math.atan2(v.y, v.x)
+            self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
+        end
         if len > 1 then v = v / len end
         v = v * self.moveSpeed * love.timer.getDelta() * timeScale * ((keyboard["lshift"] or keyboard["rshift"]) and 10 or 1)
         self:move(self.p + v)

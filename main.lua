@@ -82,12 +82,12 @@ function love.load()
         slash={3, 6, 20, 64, 64, 768, 32, 56},
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         death={5, 6, 10, 64, 64, 1280, 32, 56},
-        polearm={6, 8, 30, 192, 192, 1345, 96, 119}
+        polearm={6, 8, 25, 192, 192, 1345, 96, 119}
     }, {
         {310, 50}, {224, 315}, {136, 224}, {45, 136}
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
-    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        33.3334,            0.1)
+    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
     player:move(Vector(1000, 1000))
     characters[player.id] = player
 
@@ -106,7 +106,7 @@ function love.load()
     local numOrcs = 20000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
-        local orc = Enemy("orc"..i, orcSprite,    100,    100,        0,                  50,             20,             0.45,               10,             300,        10)
+        local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
         characters[orc.id] = orc
     end
