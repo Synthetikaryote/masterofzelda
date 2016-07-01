@@ -36,8 +36,8 @@ function Player:update()
     end
     for k, data in pairs(gamepadDirData) do
         local button, dv = data[1], data[2]
-        if gamepads[0] then
-            if gamepads[0][button] then
+        if gamepads[1] then
+            if gamepads[1][button] then
                 v = v + dv
             end
         end
