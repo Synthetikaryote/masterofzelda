@@ -5,7 +5,9 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.aniDir = 4
     self.aniFrame = 0
     self.aniLastChange = 0
+    self.aniLooping = true
     self.animationName = select(1, next(self.sprite.animations))
+    self.maxHp = hp
     self.hp = hp
     self.moveSpeed = moveSpeed
     self.facingDir = 0
@@ -20,11 +22,22 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.attackDamageTime = attackDamageTime
     self.damageColorThisFrame = 0
     self.stunEndTime = 0
+    self.despawnTime = 0
+    self.despawnQueued = false
+    self.isAlive = true
 end
 function Character:update()
+    if self.despawnQueued and love.timer.getTime() * timeScale >= self.despawnTime then
+        if xyMap[self.xyMapP.y] ~= nil then
+            if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
+                xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
+            end
+        end
+        characters[self.id] = nil
+    end
     local animation = self.sprite.animations[self.animationName]
     if love.timer.getTime() * timeScale - self.aniLastChange > 1 / animation[3] then
-        self.aniFrame = (self.aniFrame + 1) % animation[2]
+        self.aniFrame = self.aniLooping and ((self.aniFrame + 1) % animation[2]) or math.min(self.aniFrame + 1, animation[2] - 1)
         self.aniLastChange = love.timer.getTime() * timeScale
     end
 end
@@ -60,6 +73,14 @@ function Character:draw()
         -- love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
     end
 end
+function Character:lateDraw()
+    if self.hp < self.maxHp and self.isAlive then
+        love.graphics.setColor(0, 0, 0, 170)
+        love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60, 52, 4)
+        love.graphics.setColor(255, 64, 64, 170)
+        love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
+    end
+end
 function Character:move(p)
     self.p = p
     local x = math.floor(p.x / xyMapXWidth)
@@ -82,6 +103,7 @@ function Character:move(p)
 end
 function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, stunDuration)
     if love.timer.getTime() * timeScale > self.nextDamageable then
+        self.hp = math.max(0, self.hp - damage)
         self.damageEnds = (love.timer.getTime() + damageEffectDuration) * timeScale
         self.nextDamageable = (love.timer.getTime() + self.invincibilityTime) * timeScale
         self.stunEndTime = (love.timer.getTime() + stunDuration) * timeScale

@@ -14,7 +14,7 @@ timeScale = 1
 local isPaused = false
 local font12 = love.graphics.newFont(12)
 local font72 = love.graphics.newFont(72)
-local characters = {}
+characters = {}
 mapP = Vector(0, 0)
 keyboard = {}
 xyMap = {}
@@ -68,6 +68,9 @@ function love.load()
          visitCharsInRect(topLeft, bottomRight, function(c)
             c:draw()
         end)
+         visitCharsInRect(topLeft, bottomRight, function(c)
+            c:lateDraw()
+        end)
     end
 
     local playerSprite = Sprite("assets/character.png", {
@@ -77,14 +80,15 @@ function love.load()
         walk={2, 8, 18, 64, 64, 512, 32, 56},
         slash={3, 6, 20, 64, 64, 768, 32, 56},
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-        polearm={5, 8, 30, 192, 192, 1345, 96, 119}
+        death={5, 6, 10, 64, 64, 1280, 32, 56},
+        polearm={6, 8, 30, 192, 192, 1345, 96, 119}
     }, {
         {310, 50}, {224, 315}, {136, 224}, {45, 136}
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
-    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        100,            0.1)
+    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        33.3334,            0.1)
     player:move(Vector(1000, 1000))
-    table.insert(characters, player)
+    characters[player.id] = player
 
     local orcSprite = Sprite("assets/orc.png", {
         -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
@@ -93,16 +97,17 @@ function love.load()
         walk={2, 8, 18, 64, 64, 512, 32, 56},
         slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
-        attack={5, 6, 10, 192, 192, 1345, 96, 119}
+        death={5, 6, 10, 64, 64, 1280, 32, 56},
+        attack={6, 6, 10, 192, 192, 1345, 96, 119}
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 400
+    local numOrcs = 20000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
-        orc = Enemy("orc"..i, orcSprite,    100,    100,        0,                  50,             20,             0.45,               10,             200,        10)
+        local orc = Enemy("orc"..i, orcSprite,    100,    100,        0,                  50,             20,             0.45,               10,             300,        10)
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
-        table.insert(characters, orc)
+        characters[orc.id] = orc
     end
 
     dirData = {

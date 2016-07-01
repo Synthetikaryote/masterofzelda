@@ -13,49 +13,62 @@ function Enemy:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, at
 end
 hits = 0
 function Enemy:update()
-    if love.timer.getTime() * timeScale >= self.stunEndTime then
-        local dx = player.p.x - self.p.x
-        local dy = player.p.y - self.p.y
-        local distSq = dx * dx + dy * dy
-        if distSq < self.detectDist * self.detectDist then
-            local dist = math.sqrt(distSq)
-            local distInv = 1 / dist
-            local vx = dx * distInv
-            local vy = dy * distInv
-            self.facingDir = math.atan2(vy, vx)
-            self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
-            local lastAniName = self.animationName
-            if dist < self.collisionDist then
-                hits = hits + 1
-                player:gotHit(self, self.collisionDamage, 0.1, 30, 0)
-                self.nextPlayerHitQueued = false
-            elseif dist < self.attackDist then
-                if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
-                    self.animationName = "attack"
-                    self.nextPlayerHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
-                    self.nextPlayerHitQueued = true
+    if self.hp <= 0 then
+        if self.animationName ~= "death" then
+            self.animationName = "death"
+            self.aniDir = 1
+            self.aniFrame = 0
+            self.aniLooping = false
+            self.isAlive = false
+            local animation = self.sprite.animations[self.animationName]
+            local aniDuration = animation[2] * (1 / animation[3])
+            self.despawnTime = (love.timer.getTime() + aniDuration * 2) * timeScale
+            self.despawnQueued = true
+        end
+        Character.update(self)
+    else
+        if love.timer.getTime() * timeScale >= self.stunEndTime then
+            local dx = player.p.x - self.p.x
+            local dy = player.p.y - self.p.y
+            local distSq = dx * dx + dy * dy
+            if distSq < self.detectDist * self.detectDist then
+                local dist = math.sqrt(distSq)
+                local distInv = 1 / dist
+                local vx = dx * distInv
+                local vy = dy * distInv
+                self.facingDir = math.atan2(vy, vx)
+                self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
+                local lastAniName = self.animationName
+                if dist < self.collisionDist then
+                    hits = hits + 1
+                    player:gotHit(self, self.collisionDamage, 0.1, 30, 0)
+                    self.nextPlayerHitQueued = false
+                elseif dist < self.attackDist then
+                    if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
+                        self.animationName = "attack"
+                        self.nextPlayerHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
+                        self.nextPlayerHitQueued = true
+                    end
+                    if love.timer.getTime() * timeScale >= self.nextPlayerHitTime and self.nextPlayerHitQueued then
+                       self.nextPlayerHitQueued = false
+                        player:gotHit(self, self.attackDamage, 0.1, 90, 0)
+                    end
+                elseif dist < self.detectDist then
+                    self.nextPlayerHitQueued = false
+                    self.animationName = "walk"
+                    local mult = self.moveSpeed * love.timer.getDelta() * timeScale
+                    self:move(Vector(self.p.x + vx * mult, self.p.y + vy * mult))
+                else
+                    self.nextPlayerHitQueued = false
+                    self.animationName = "walk"
+                    self.aniFrame = 0
+                    self.aniLastChange = love.timer.getTime() * timeScale
                 end
-                if love.timer.getTime() * timeScale >= self.nextPlayerHitTime and self.nextPlayerHitQueued then
-                   self.nextPlayerHitQueued = false
-                    player:gotHit(self, self.attackDamage, 0.1, 90, 0)
+                if lastAniName ~= self.animationName then
+                    self.aniFrame = 0
                 end
-            elseif dist < self.detectDist then
-                self.nextPlayerHitQueued = false
-                self.animationName = "walk"
-                local mult = self.moveSpeed * love.timer.getDelta() * timeScale
-                self:move(Vector(self.p.x + vx * mult, self.p.y + vy * mult))
-            else
-                self.nextPlayerHitQueued = false
-                self.animationName = "walk"
-                self.aniFrame = 0
-                self.aniLastChange = love.timer.getTime() * timeScale
+                Character.update(self)
             end
-
-            if lastAniName ~= self.animationName then
-                self.aniFrame = 0
-            end
-
-            Character.update(self)
         end
     end
 end
