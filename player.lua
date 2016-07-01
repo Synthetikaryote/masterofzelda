@@ -1,6 +1,20 @@
 local newAniDir = 0
 local deg = 0
 
+local dirData = {
+    {"up", Vector(0, -1)},
+    {"left", Vector(-1, 0)},
+    {"down", Vector(0, 1)},
+    {"right", Vector(1, 0)}
+}
+local gamepadDirData = {
+    {"dpup", Vector(0, -1)},
+    {"dpleft", Vector(-1, 0)},
+    {"dpdown", Vector(0, 1)},
+    {"dpright", Vector(1, 0)}
+}
+
+
 Player = class(Character)
 function Player:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
     Character.init(self, id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
@@ -18,6 +32,14 @@ function Player:update()
         local key, dv = data[1], data[2]
         if keyboard[key] then
             v = v + dv
+        end
+    end
+    for k, data in pairs(gamepadDirData) do
+        local button, dv = data[1], data[2]
+        if gamepads[0] then
+            if gamepads[0][button] then
+                v = v + dv
+            end
         end
     end
     local len = v:len()

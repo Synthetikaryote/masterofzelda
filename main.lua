@@ -110,13 +110,6 @@ function love.load()
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
         characters[orc.id] = orc
     end
-
-    dirData = {
-        {"up", Vector(0, -1)},
-        {"left", Vector(-1, 0)},
-        {"down", Vector(0, 1)},
-        {"right", Vector(1, 0)}
-    }
 end
 
 function visitCharsInRadius(p, r, f)
