@@ -165,7 +165,7 @@ function love.keyreleased(key, scancode, isRepeat)
 end
 
 function love.gamepadpressed(gamepad, button)
-    local id = gamepad.getID()
+    local id = gamepad:getID()
     if gamepads[id] == nil then
         gamepads[id] = {}
     end
@@ -174,7 +174,7 @@ function love.gamepadpressed(gamepad, button)
     player:gamepadpressed(gamepad, button)
 end
 function love.gamepadreleased(gamepad, button)
-    local id = gamepad.getID()
+    local id = gamepad:getID()
     if gamepads[id] == nil then
         gamepads[id] = {}
     end
@@ -216,6 +216,7 @@ function love.draw()
         "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 400, 300)
 
     print_r(log, 0, 0)
+    print_r(gamepads, 0, 0)
 
     if isPaused then
         love.graphics.setFont(font72)

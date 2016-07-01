@@ -60,7 +60,7 @@ function Player:keypressed(key, scancode, isRepeat)
     self:checkAttack(scancode, nil)
 end
 function Player:gamepadpressed(gamepad, button)
-    self:checkAttack(nil, scancode)
+    self:checkAttack(nil, button)
 end
 function Player:checkAttack(scancode, button)
     if scancode == "space" or button == "a" then
