@@ -13,6 +13,7 @@ local sti = require "sti"
 timeScale = 1
 local isPaused = false
 local font12 = love.graphics.newFont(12)
+local font48 = love.graphics.newFont(48)
 local font72 = love.graphics.newFont(72)
 characters = {}
 mapP = Vector(0, 0)
@@ -29,6 +30,8 @@ bottomYOffset = 0
 xyMapXWidth = love.graphics.getWidth() * 0.1
 coroutines = {}
 log = ""
+obstacles = nil
+showDebug = false
 
 showAggro = false
 showAttackDist = false
@@ -52,6 +55,7 @@ function love.load()
 
     map:addCustomLayer("Sprite Layer", 6)
     local spriteLayer = map.layers["Sprite Layer"]
+    obstacles = map.layers["level 1 obstacles"]
 
     -- update callback for custom layers
     function spriteLayer:update(dt)
@@ -103,7 +107,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 20000
+    local numOrcs = 100
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
@@ -144,6 +148,8 @@ function love.keypressed(key, scancode, isRepeat)
     elseif scancode == "pause" then
         isPaused = not isPaused
         timeScale = isPaused and 0 or 1
+    elseif scancode == "f3" then
+        showDebug = not showDebug
     end
 
     if isPaused then
@@ -204,15 +210,20 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
-        "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
-        "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS(), 10, 10)
+    if showDebug then
+        love.graphics.print("x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
+            "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
+            "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 10, 130)
+        print_r(gamepads, 10, 270)
 
-    print_r(log, 0, 0)
-    print_r(gamepads, 0, 0)
+        print_r(log, 10, 370)
+    end
+    log = "hello"
 
-    love.graphics.setFont(font72)
+    love.graphics.setFont(font48)
     love.graphics.print("Kills: "..player.killCount, 40, 40)
+    love.graphics.print("Deaths: "..player.deaths, 40, 110)
     love.graphics.setFont(font12)
 
     if isPaused then
