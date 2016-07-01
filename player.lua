@@ -57,7 +57,13 @@ function Player:draw()
     Character.draw(self)
 end
 function Player:keypressed(key, scancode, isRepeat)
-    if scancode == "space" then
+    self:checkAttack(scancode, nil)
+end
+function Player:gamepadpressed(gamepad, button)
+    self:checkAttack(nil, scancode)
+end
+function Player:checkAttack(scancode, button)
+    if scancode == "space" or button == "a" then
         if self.animationName ~= "polearm" then
             self.animationName = "polearm"
             self.aniFrame = 0

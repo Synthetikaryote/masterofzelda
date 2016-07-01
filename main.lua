@@ -17,6 +17,7 @@ local font72 = love.graphics.newFont(72)
 characters = {}
 mapP = Vector(0, 0)
 keyboard = {}
+gamepads = {}
 xyMap = {}
 -- to prevent sprites from being culled near the edges of the screen,
 -- this keeps track of the biggest offset to render at the edges
@@ -161,6 +162,23 @@ end
 
 function love.keyreleased(key, scancode, isRepeat)
     keyboard[scancode] = nil
+end
+
+function love.gamepadpressed(gamepad, button)
+    local id = gamepad.getID()
+    if gamepads[id] == nil then
+        gamepads[id] = {}
+    end
+    gamepads[id][button] = 1
+
+    player:gamepadpressed(gamepad, button)
+end
+function love.gamepadreleased(gamepad, button)
+    local id = gamepad.getID()
+    if gamepads[id] == nil then
+        gamepads[id] = {}
+    end
+    gamepads[id][button] = nil
 end
 
 function love.update()
