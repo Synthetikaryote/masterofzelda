@@ -26,6 +26,8 @@ rightXOffset = 0
 topYOffset = 0
 bottomYOffset = 0
 xyMapXWidth = love.graphics.getWidth() * 0.1
+coroutines = {}
+log = ""
 
 local showAggro = false
 
@@ -56,28 +58,15 @@ function love.load()
     -- draw callback for custom layer
     function spriteLayer:draw()
         numVisited = 0
-        local topY = math.floor(-mapP.y - topYOffset)
-        local bottomY = math.floor(-mapP.y + love.graphics.getHeight() + bottomYOffset)
-        local leftX = math.floor((-mapP.x - leftXOffset) / xyMapXWidth)
-        local rightX = math.floor((-mapP.x + love.graphics.getWidth()) / xyMapXWidth + rightXOffset)
-        for i = 1, 2 do -- 2 passes: earlyDraw, draw
-            for y = topY, bottomY do
-                if xyMap[y] then
-                    for x = leftX, rightX do
-                        if xyMap[y][x] then
-                            for k, v in pairs(xyMap[y][x]) do
-                                if i == 1 then
-                                    numVisited = numVisited + 1
-                                    v:earlyDraw()
-                                elseif i == 2 then
-                                    v:draw()
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
+        local topLeft = Vector(-mapP.x - leftXOffset, -mapP.y - topYOffset)
+        local bottomRight = Vector(-mapP.x + love.graphics.getWidth() + rightXOffset, -mapP.y + love.graphics.getHeight() + bottomYOffset)
+        visitCharsInRect(topLeft, bottomRight, function(c)
+            numVisited = numVisited + 1
+            c:earlyDraw()
+        end)
+         visitCharsInRect(topLeft, bottomRight, function(c)
+            c:draw()
+        end)
     end
 
     local playerSprite = Sprite("assets/character.png", {
@@ -91,8 +80,9 @@ function love.load()
     }, {
         {310, 50}, {224, 315}, {136, 224}, {45, 136}
     })
-    player = Player("player", playerSprite, 100, 200)
-    player:move(Vector(0, 0))
+    -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
+    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        100,            0.1)
+    player:move(Vector(1000, 1000))
     table.insert(characters, player)
 
     local orcSprite = Sprite("assets/orc.png", {
@@ -108,7 +98,8 @@ function love.load()
     })
     local numOrcs = 400
     for i=1,numOrcs do
-        orc = Enemy("orc"..i, orcSprite, 100, 100, 200, 50)
+        -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
+        orc = Enemy("orc"..i, orcSprite,    100,    100,        0,                  50,             20,             0.45,               10,             200,        10)
         orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
         table.insert(characters, orc)
     end
@@ -119,6 +110,30 @@ function love.load()
         {"down", Vector(0, 1)},
         {"right", Vector(1, 0)}
     }
+end
+
+function visitCharsInRadius(p, r, f)
+    visitCharsInRect(Vector(p.x - r, p.y - r), Vector(p.x + r, p.y + r), function(c)
+        if (c.p - p):lenSq() < r * r then
+            f(c)
+        end
+    end)
+end
+
+function visitCharsInRect(topLeft, bottomRight, f)
+    topLeft = Vector(math.floor(topLeft.x / xyMapXWidth), math.floor(topLeft.y))
+    bottomRight = Vector(math.floor(bottomRight.x / xyMapXWidth), math.floor(bottomRight.y))
+    for y = topLeft.y, bottomRight.y do
+        if xyMap[y] then
+            for x = topLeft.x, bottomRight.x do
+                if xyMap[y][x] then
+                    for k, v in pairs(xyMap[y][x]) do
+                        f(v)
+                    end
+                end
+            end
+        end
+    end
 end
 
 function love.keypressed(key, scancode, isRepeat)
@@ -149,13 +164,22 @@ function love.update()
 
     showAggro = keyboard["lctrl"] or keyboard["rctrl"]
 
-
+    for i = #coroutines, 1, -1 do
+        local c = coroutines[i]
+        if coroutine.resume(c) == false then
+            table.remove(coroutines, i)
+        end
+    end
+    
     for k, v in pairs(characters) do
         v:update()
     end
 
     map:update(love.timer.getDelta() * timeScale)
 end
+
+vt = Vector(0, 0)
+iterations = 0
 
 function love.draw()
 
@@ -165,7 +189,11 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "").."\nnumVisited "..numVisited, 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
+        "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." vt "..vt.x..", "..vt.y.." iterations "..iterations..
+        "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 400, 300)
+
+    print_r(log, 0, 0)
 
     if isPaused then
         love.graphics.setFont(font72)

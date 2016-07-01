@@ -2,6 +2,11 @@ local newAniDir = 0
 local deg = 0
 
 Player = class(Character)
+function Player:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
+    Character.init(self, id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
+    self.nextHitTime = 0
+    self.nextHitQueued = false
+end
 function Player:update()
     local joystick = love.joystick.getJoysticks()[1]
     local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
@@ -19,17 +24,27 @@ function Player:update()
     if len > 0 then
         moving = true
         -- vector direction converted to an angle and mapped to the directions in the sprite
-        self.aniDir = self.sprite:getAniDirFromAngle(math.atan2(v.y, -v.x))
+        self.facingDir = math.atan2(v.y, -v.x)
+        self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
         if len > 1 then v = v / len end
         v = v * self.moveSpeed * love.timer.getDelta() * timeScale * ((keyboard["lshift"] or keyboard["rshift"]) and 10 or 1)
         self:move(self.p + v)
     end
 
     if love.timer.getTime() * timeScale <= self.attackEnds then
-        self.animationName = "polearm"
+        if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
+            self.nextHitQueued = false
+            visitCharsInRadius(self.p, self.attackDist, function(c)
+                if c ~= self then
+                    c:gotHit(self, self.attackDamage, 90)
+                end
+            end)
+        end
     elseif moving then
+        self.nextHitQueued = false
         self.animationName = "walk"
     else
+        self.nextHitQueued = false
         self.animationName = "walk"
         self.aniFrame = 0
         self.aniLastChange = love.timer.getTime() * timeScale
@@ -39,14 +54,19 @@ function Player:update()
 end
 function Player:draw()
     Character.draw(self)
-
-    love.graphics.print("aniDir "..(newAniDir or "nil").." deg "..deg)
 end
 function Player:keypressed(key, scancode, isRepeat)
     if scancode == "space" then
-        self.animationName = "polearm"
-        local animation = self.sprite.animations[self.animationName]
-        local aniDuration = animation[2] * (1 / animation[3])
-        self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
+        if self.animationName ~= "polearm" then
+            self.animationName = "polearm"
+            self.aniFrame = 0
+            if self.nextHitQueued == false then
+                self.nextHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
+                self.nextHitQueued = true
+            end
+            local animation = self.sprite.animations[self.animationName]
+            local aniDuration = animation[2] * (1 / animation[3])
+            self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
+        end
     end
 end

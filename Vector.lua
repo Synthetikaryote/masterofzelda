@@ -26,11 +26,6 @@ end
 function Vector:len()
     return math.sqrt(self:lenSq())
 end
-function Vector:normalize()
-    len = self:len()
-    self = self / len
-    return len
-end
 function Vector:normalized()
     return self / self:len()
 end

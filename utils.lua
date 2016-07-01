@@ -1,5 +1,5 @@
 -- print an object's contents.  if it's a table, it will print it recursively
-function print_r ( t, x, y )  
+function print_r (t, x, y)
     local print_r_cache={}
     local function sub_print_r(t,indent)
         if (print_r_cache[tostring(t)]) then
