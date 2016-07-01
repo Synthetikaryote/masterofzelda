@@ -103,7 +103,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 20000
+    local numOrcs = 100000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
@@ -210,6 +210,10 @@ function love.draw()
 
     print_r(log, 0, 0)
     print_r(gamepads, 0, 0)
+
+    love.graphics.setFont(font72)
+    love.graphics.print("Kills: "..player.killCount, 40, 40)
+    love.graphics.setFont(font12)
 
     if isPaused then
         love.graphics.setFont(font72)

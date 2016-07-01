@@ -25,7 +25,6 @@ function Enemy:update()
             self.despawnTime = (love.timer.getTime() + aniDuration * 2) * timeScale
             self.despawnQueued = true
         end
-        Character.update(self)
     else
         if love.timer.getTime() * timeScale >= self.stunEndTime then
             local dx = player.p.x - self.p.x
@@ -67,7 +66,6 @@ function Enemy:update()
                 if lastAniName ~= self.animationName then
                     self.aniFrame = 0
                 end
-                Character.update(self)
             end
         end
     end
