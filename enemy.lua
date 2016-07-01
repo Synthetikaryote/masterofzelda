@@ -13,6 +13,7 @@ function Enemy:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, at
 end
 hits = 0
 function Enemy:update()
+    local shouldBaseUpdate = #self.coroutines > 0
     if self.hp <= 0 then
         if self.animationName ~= "death" then
             self.animationName = "death"
@@ -25,6 +26,7 @@ function Enemy:update()
             self.despawnTime = (love.timer.getTime() + aniDuration * 2) * timeScale
             self.despawnQueued = true
         end
+        shouldBaseUpdate = true
     else
         if love.timer.getTime() * timeScale >= self.stunEndTime then
             local dx = player.p.x - self.p.x
@@ -66,8 +68,12 @@ function Enemy:update()
                 if lastAniName ~= self.animationName then
                     self.aniFrame = 0
                 end
+                shouldBaseUpdate = true
             end
         end
+    end
+    if shouldBaseUpdate then
+        Character.update(self)
     end
 end
 function Enemy:earlyDraw()
