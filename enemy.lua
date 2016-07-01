@@ -26,7 +26,7 @@ function Enemy:update()
         local lastAniName = self.animationName
         if dist < self.collisionDist then
             hits = hits + 1
-            player:gotHit(self, self.collisionDamage, 30)
+            player:gotHit(self, self.collisionDamage, 0.1, 30, 0)
             self.nextPlayerHitQueued = false
         elseif dist < self.attackDist then
             if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
@@ -36,7 +36,7 @@ function Enemy:update()
             end
             if love.timer.getTime() * timeScale >= self.nextPlayerHitTime and self.nextPlayerHitQueued then
                self.nextPlayerHitQueued = false
-                player:gotHit(self, self.attackDamage, 90)
+                player:gotHit(self, self.attackDamage, 0.1, 90, 0)
             end
         elseif dist < self.detectDist then
             self.nextPlayerHitQueued = false
@@ -68,7 +68,7 @@ function Enemy:earlyDraw()
         love.graphics.circle("fill", x, y, self.detectDist, 40)
         love.graphics.setColor(255, 255, 255, 255)
     end
-    Character.earlyDraw()
+    Character.earlyDraw(self)
 end
 function Enemy:draw()
     Character.draw(self)

@@ -18,6 +18,8 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.attackDist = attackDist
     self.attackDamage = attackDamage
     self.attackDamageTime = attackDamageTime
+    self.damageColorThisFrame = 0
+    self.stunEndTime = 0
 end
 function Character:update()
     local animation = self.sprite.animations[self.animationName]
@@ -27,6 +29,16 @@ function Character:update()
     end
 end
 function Character:earlyDraw()
+    if showAttackDist then
+        local animation = self.sprite.animations[self.animationName]
+        local x = mapP.x + self.p.x
+        local y = mapP.y + self.p.y
+        love.graphics.setColor(0, 0, 255, 255)
+        love.graphics.circle("line", x, y, self.attackDist, 40)
+        love.graphics.setColor(0, 0, 255, 50)
+        love.graphics.circle("fill", x, y, self.attackDist, 40)
+        love.graphics.setColor(255, 255, 255, 255)
+    end
 end
 function Character:draw()
     local animation = self.sprite.animations[self.animationName]
@@ -36,21 +48,21 @@ function Character:draw()
     local bottomY = topY + animation[5]
     if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
         if love.timer.getTime() * timeScale < self.damageEnds then
-            love.graphics.setColor(255, 0, 0, 255)
+            self.damageColorThisFrame = (self.damageColorThisFrame + 1) % 3
+            love.graphics.setColor(self.damageColorThisFrame == 0 and 255 or 0, self.damageColorThisFrame == 1 and 255 or 0, self.damageColorThisFrame == 2 and 255 or 0, 255)
         end
         local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
         love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY)
         if love.timer.getTime() * timeScale < self.damageEnds then
             love.graphics.setColor(255, 255, 255, 255)
         end
-        -- love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
+        love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
     end
 end
 function Character:move(p)
     self.p = p
-    local animation = self.sprite.animations[self.animationName]
-    local x = math.floor((p.x - animation[7]) / xyMapXWidth)
-    local y = math.floor(p.y - animation[8])
+    local x = math.floor(p.x / xyMapXWidth)
+    local y = math.floor(p.y)
     if self.xyMapP.x ~= x or self.xyMapP.y ~= y then
         if xyMap[self.xyMapP.y] ~= nil then
             if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
@@ -67,17 +79,16 @@ function Character:move(p)
         xyMap[y][x][self.id] = self
     end
 end
-function Character:gotHit(source, damage, knockbackDist)
+function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, stunDuration)
     if love.timer.getTime() * timeScale > self.nextDamageable then
-        self.damageEnds = (love.timer.getTime() + 0.1) * timeScale
+        self.damageEnds = (love.timer.getTime() + damageEffectDuration) * timeScale
         self.nextDamageable = (love.timer.getTime() + self.invincibilityTime) * timeScale
+        self.stunEndTime = (love.timer.getTime() + stunDuration) * timeScale
         local dp = source.p - self.p
-        n = dp:normalized()
-        vt = Vector(n.x, n.y)
+        local n = dp:normalized()
         table.insert(coroutines, coroutine.create(function()
             local knockbackSpeed = 500
             while knockbackDist > 0 do
-                iterations = iterations + 1
                 local dist = math.min(knockbackDist, love.timer.getDelta() * timeScale * knockbackSpeed)
                 knockbackDist = knockbackDist - dist
                 self:move(self.p + -n * dist)

@@ -34,9 +34,10 @@ function Player:update()
     if love.timer.getTime() * timeScale <= self.attackEnds then
         if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
             self.nextHitQueued = false
+            local animation = self.sprite.animations[self.animationName]
             visitCharsInRadius(self.p, self.attackDist, function(c)
                 if c ~= self then
-                    c:gotHit(self, self.attackDamage, 90)
+                    c:gotHit(self, self.attackDamage, 0.3, 90, 0.5)
                 end
             end)
         end

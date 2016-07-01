@@ -29,7 +29,8 @@ xyMapXWidth = love.graphics.getWidth() * 0.1
 coroutines = {}
 log = ""
 
-local showAggro = false
+showAggro = false
+showAttackDist = false
 
 local numVisited = 0
 function love.load()
@@ -163,6 +164,7 @@ function love.update()
     end
 
     showAggro = keyboard["lctrl"] or keyboard["rctrl"]
+    showAttackDist = keyboard["lalt"] or keyboard["ralt"]
 
     for i = #coroutines, 1, -1 do
         local c = coroutines[i]
@@ -178,9 +180,6 @@ function love.update()
     map:update(love.timer.getDelta() * timeScale)
 end
 
-vt = Vector(0, 0)
-iterations = 0
-
 function love.draw()
 
     map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -190,7 +189,7 @@ function love.draw()
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
     love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
-        "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." vt "..vt.x..", "..vt.y.." iterations "..iterations..
+        "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits..
         "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 400, 300)
 
     print_r(log, 0, 0)
