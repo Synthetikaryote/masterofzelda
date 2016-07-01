@@ -24,7 +24,7 @@ function Player:update()
     if len > 0 then
         moving = true
         -- vector direction converted to an angle and mapped to the directions in the sprite
-        self.facingDir = math.atan2(v.y, -v.x)
+        self.facingDir = math.atan2(v.y, v.x)
         self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
         if len > 1 then v = v / len end
         v = v * self.moveSpeed * love.timer.getDelta() * timeScale * ((keyboard["lshift"] or keyboard["rshift"]) and 10 or 1)
@@ -35,9 +35,9 @@ function Player:update()
         if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
             self.nextHitQueued = false
             local animation = self.sprite.animations[self.animationName]
-            visitCharsInRadius(self.p, self.attackDist, function(c)
+            visitCharsInRadius(Vector(self.p.x + self.attackDist * 0.5 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.5, function(c)
                 if c ~= self then
-                    c:gotHit(self, self.attackDamage, 0.3, 90, 0.5)
+                    c:gotHit(self, self.attackDamage, 0.5, 90, 0.5)
                 end
             end)
         end

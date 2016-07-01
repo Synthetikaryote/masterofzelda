@@ -48,15 +48,16 @@ function Character:draw()
     local bottomY = topY + animation[5]
     if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
         if love.timer.getTime() * timeScale < self.damageEnds then
-            self.damageColorThisFrame = (self.damageColorThisFrame + 1) % 3
-            love.graphics.setColor(self.damageColorThisFrame == 0 and 255 or 0, self.damageColorThisFrame == 1 and 255 or 0, self.damageColorThisFrame == 2 and 255 or 0, 255)
+            self.damageColorThisFrame = math.floor(love.timer.getTime() * 35) % 3
+            local offVal = 128
+            love.graphics.setColor((self.damageColorThisFrame == 0) and 255 or offVal, (self.damageColorThisFrame == 2) and 255 or offVal, (self.damageColorThisFrame == 1) and 255 or offVal, 255)
         end
         local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
         love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY)
         if love.timer.getTime() * timeScale < self.damageEnds then
             love.graphics.setColor(255, 255, 255, 255)
         end
-        love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
+        -- love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
     end
 end
 function Character:move(p)

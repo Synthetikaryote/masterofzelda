@@ -24,7 +24,7 @@ function Sprite:init(filename, animations, aniDirs)
     topYOffset = math.max(topYOffset, biggestPivotHeight)
 end
 function Sprite:getAniDirFromAngle(a)
-    deg = (360 - (math.deg(a) + 90)) % 360
+    deg = (math.deg(a) + 90) % 360
     for k, v in pairs(self.aniDirs) do
         low, high = v[1], v[2]
         if low > high then
