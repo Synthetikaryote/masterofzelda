@@ -40,11 +40,11 @@ function Enemy:update()
                 self.facingDir = math.atan2(vy, vx)
                 self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
                 local lastAniName = self.animationName
-                if dist < self.collisionDist then
+                if player.isAlive and dist < self.collisionDist then
                     hits = hits + 1
                     player:gotHit(self, self.collisionDamage, 0.1, 30, 0)
                     self.nextPlayerHitQueued = false
-                elseif dist < self.attackDist then
+                elseif player.isAlive and dist < self.attackDist then
                     if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
                         self.animationName = "attack"
                         self.nextPlayerHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
@@ -54,7 +54,7 @@ function Enemy:update()
                        self.nextPlayerHitQueued = false
                         player:gotHit(self, self.attackDamage, 0.1, 90, 0)
                     end
-                elseif dist < self.detectDist then
+                elseif player.isAlive and dist < self.detectDist then
                     self.nextPlayerHitQueued = false
                     self.animationName = "walk"
                     local mult = self.moveSpeed * love.timer.getDelta() * timeScale

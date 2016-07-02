@@ -94,15 +94,49 @@ function Character:lateDraw()
         love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
     end
 end
-function Character:move(p)
+function Character:move(p, skipCollision, slideAlongWalls)
+    local slideAlongWalls = slideAlongWalls == nil and true or false
     local mapX, mapY = map:convertScreenToWorld(p.x, p.y)
     mapX, mapY = math.floor(mapX) + 1, math.floor(mapY) + 1
-    local tileIndex = nil
-    if obstacles.data[mapY] then
-        tileIndex = obstacles.data[mapY][mapX]
-    end
-    if tileIndex then
-        return
+
+    if not skipCollision then
+        -- list the tiles this will move through
+        local dp = p - self.p
+        local dist = dp:len()
+        local n = dp / dist
+        local d = 0
+        local q = self.p
+        local m = vector(0, 0)
+        local tW, tH = 32, 32
+        local tilesHit = {}
+        local i = 0
+        repeat
+            i = i + 1
+            m.x, m.y = map:convertScreenToWorld(q.x + d * n.x, q.y + d * n.y)
+            local dx = n.x ~= 0 and ((math.floor(m.x + (n.x > 0 and 0.99 or 0)) - m.x) * tW / n.x) or dist
+            local dy = n.y ~= 0 and ((math.floor(m.y + (n.y > 0 and 0.99 or 0)) - m.y) * tH / n.y) or dist
+            d = d + math.min(dx, dy)
+            if d < dist then
+                local collisionPoint = vector(q.x + d * n.x + (n.x > 0 and -0.001 or 0), q.y + d * n.y + (n.y > 0 and -0.001 or 0))
+                local newDir = (dx < dy) and vector(0, n.y == 0 and 0 or (n.y > 0 and 1 or -1)) or vector(n.x == 0 and 0 or (n.x > 0 and 1 or -1), 0)
+                table.insert(tilesHit, {vector(m.x + 1, m.y + 1), collisionPoint, newDir, dist - d})
+            end
+        until d >= dist or i >= 10
+        -- go through the hit tiles in order to check if they have an entry on the obstacles
+        for k, v in ipairs(tilesHit) do
+            local m, cp, newDir, d = v[1], v[2], v[3], v[4]
+            if obstacles.data[mapY] then
+                if obstacles.data[mapY][mapX] then
+                    -- a collision was found.  move the player to the collision point (without collision check)
+                    -- then move them along that wall the rest of their intended travel distance
+                    self:move(cp, true, false)
+                    if slideAlongWalls then
+                        self:move(self.p + newDir * d, false, false)
+                    end
+                    return
+                end
+            end
+        end
     end
     self.p = p
     self.mapP = vector(mapX, mapY)
