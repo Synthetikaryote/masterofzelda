@@ -68,42 +68,81 @@
  <tileset firstgid="257" name="32x32-tileset-obstacles1" tilewidth="32" tileheight="32" tilecount="256" columns="16">
   <image source="32x32-tileset-obstacles1.png" width="512" height="512"/>
  </tileset>
- <layer name="level 1 floor 1" width="240" height="240">
+ <tileset firstgid="513" name="CampFireFinished" tilewidth="32" tileheight="32" tilecount="20" columns="10">
+  <image source="../CampFireFinished.png" width="320" height="64"/>
+  <tile id="0">
+   <animation>
+    <frame tileid="0" duration="80"/>
+    <frame tileid="2" duration="80"/>
+    <frame tileid="4" duration="80"/>
+    <frame tileid="6" duration="80"/>
+    <frame tileid="8" duration="80"/>
+   </animation>
+  </tile>
+  <tile id="1">
+   <animation>
+    <frame tileid="1" duration="80"/>
+    <frame tileid="3" duration="80"/>
+    <frame tileid="5" duration="80"/>
+    <frame tileid="7" duration="80"/>
+    <frame tileid="9" duration="80"/>
+   </animation>
+  </tile>
+  <tile id="10">
+   <animation>
+    <frame tileid="10" duration="80"/>
+    <frame tileid="12" duration="80"/>
+    <frame tileid="14" duration="80"/>
+    <frame tileid="16" duration="80"/>
+    <frame tileid="18" duration="80"/>
+   </animation>
+  </tile>
+  <tile id="11">
+   <animation>
+    <frame tileid="11" duration="80"/>
+    <frame tileid="13" duration="80"/>
+    <frame tileid="15" duration="80"/>
+    <frame tileid="17" duration="80"/>
+    <frame tileid="19" duration="80"/>
+   </animation>
+  </tile>
+ </tileset>
+ <layer name="level 1 floor 1" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJztwwENAAAAwqA3tH8bi8DGqqmqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqraAZpdcww=
   </data>
  </layer>
- <layer name="level 1 floor 2" width="240" height="240">
+ <layer name="level 1 floor 2" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt3btyHEUUBuB2DjwBkEBonNiZ34KCiIewM5MxGWQ4sZ1wS0AJkIET4NmYKblLvb2nZ3pGM0hY31d1SqWqlXYV/OrL9CUlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGN9eu/y62fj18/v3exnAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAd8Z6d2W9dyOfFMhybp+M9cHK+nCH9/U/ALaZMlTndhjrk4X66s1rn6a+tjlq2/P7Xud/ANxl76fz3D4Y67uxvh/rh46fm2ube9p2+YVtcg6HdJnb7Nexfhvr9+BnojY7qqfB66b3qdvyBwnYIue3bgP/Guvvsf55833Z/107Th6SrMIRcn6ntjKaR9o6tzUkmYWjlePY3AZfp61tjWlfjPWyqFdH/UFwh9xP53PJWzNbz4FNcm6fjfVLUV8mGYY99Mwlz/WPo7moVm7Lujj6D4O3XM9c8pD654x7ciu/sI/o+e+W5ztrciu/sI9y/LtlHUWd22/G+rOor5P8wpGiZ8B5/VVZ5VqsVnt7kU7Xbv2c4uxOOX991B8Ed0Q5/i3zm9dflfU8XWW4lcuLdLp2K3qd7MI+6ue/ue38Np3n96d0tR7rjxT3kaf8lmu3yvzmvnWdXfuQYJs6v1G7W7a/UZ+6zOj0XLdcp1GOi1ttbmsNJzCvnr/KbWdZP6Z2pqM+cj2HVba50T7Cx8k6S9iqXAMd7d2NMp0r6iO32tnWs+b8vvrPsF7ZBteZ6jknpxwLR9mN9kAMjfeUYVhvynB5rsbSfoQlc3sghnTZV47e0xgYtsuZuk6uWv3kIZ2Pc+vXyi/so5ybXjNGba3JzLlttc1DMocFe+kZF0f1JHh9zv3ceXmyC/taGhf3VrS3eEhyC/+Fcly8plq5H5LcwhE+GuvjnX5XK/eyC8d4ONajm/4QAABAqDxb1pmU8P8QneHhTB24/absRmfdledC53xrk+H2aGW3PgPgi9Te0wTsY835N0vZLff+v07xfv+ePY1An97zb+ayW56N1Xv/Urlf2BlasM3SHYaTVnaj3M7tPazXZNbrqu0/hCut/muZ03qfYZ3huezO5XZIp+stp98zzWVF+6LsH4ZTc3cjlTmt85QzNHenSpnduf2E5bPh6ffk+WnrqiHWe2d32dbV95BO2c7nYtV3qLSyO6Tz3C49YwKu9NxH2OqrRncJlzmu55Wjszd670GzzgPOrbkLOBpr1n3p6PyN1rk5S8+W5Bfm9eZ3SO2x5ty5O62zKNdkV34h1pvfpXnepXN3hnQ61l2TXfefQew6+S3nivO65bl54tZYN7p/JbqLBTjVe85V3XeO2tD6LrO6ytfX6yaB4/XOFxvPwu1Qr6lYGqvWz39b6yeB49X3hS7NM9XPf41l4eZE+a3bWXPEcDtF7WndzsouAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALwd/gXdKbFp
   </data>
  </layer>
- <layer name="level 1 floor 3" width="240" height="240">
+ <layer name="level 1 floor 3" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt3UEKgzAUBNB/Iy9QxQO0nkC9/zGaoIItQlNaCIH3YPazGT5ZJQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+55bS7xkqdwHKHLvtUh57pqqNgBJ5u+fd5owpa8VOQJl7vO52CduFVsyxbdZuAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA3+a/u/pShbh3gC+e/unOmunWAQvn2dmG/0Jqr7Y4pa8VOwGdX23V7oQ3vb94xZQm3F1owx7bXI3YLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwL88AffbE/g=
   </data>
  </layer>
- <layer name="level 1 floor 4" width="240" height="240">
+ <layer name="level 1 floor 4" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt1aEBACAMBLFOicd0/xFYAIGCAol89e4iAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4A/t9AFgSZ9suf0FUIV+wx30GwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgJcMS0wCOw==
   </data>
  </layer>
  <layer name="level 1 obstacles" width="240" height="240">
   <data encoding="base64" compression="zlib">
-   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
+   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
   </data>
  </layer>
- <layer name="level 2 floor" width="240" height="240">
+ <layer name="level 2 floor" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt1ckNg1AQREFiYEkATAI2JMCSf0ruFD4cvhBV0juONLduGgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4I3a1KU+DZV/AcqMaUqfNFf+BSjzTb+0pPXCvf2Gera0pyOdF+7tNzzX3f0G6rm73wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvNcfH2cFcQ==
   </data>
  </layer>
- <layer name="level 2 obstacles" width="240" height="240">
+ <layer name="level 2 obstacles" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt1TEKwCAQBEBJzAPSpLfx/0/MPcDCSFCEGdjmimO7TQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYNwROSM5ci3uAvS7G7dnegtgRGnc6scf9hv2ZL9hX3/sNwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADzvMF5APk=
   </data>
  </layer>
- <layer name="level 2 foreground" width="240" height="240">
+ <layer name="level 2 foreground" width="240" height="240" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt08ENgkAARNFd1AJALUDRAkQtANT+W3JK8ELMJu8l/z6XKQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgNbVWkqXNmmbdvXfi4Bf9fnrkPbpkI7+C8045a/nNKZLuvovNOOWv07pnh7p6b/QjDl/XdIrvdPHfwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAVfAHY8gOF
   </data>

@@ -294,6 +294,126 @@ return {
       terrains = {},
       tilecount = 256,
       tiles = {}
+    },
+    {
+      name = "CampFireFinished",
+      firstgid = 513,
+      tilewidth = 32,
+      tileheight = 32,
+      spacing = 0,
+      margin = 0,
+      image = "../CampFireFinished.png",
+      imagewidth = 320,
+      imageheight = 64,
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      properties = {},
+      terrains = {},
+      tilecount = 20,
+      tiles = {
+        {
+          id = 0,
+          animation = {
+            {
+              tileid = "0",
+              duration = "80"
+            },
+            {
+              tileid = "2",
+              duration = "80"
+            },
+            {
+              tileid = "4",
+              duration = "80"
+            },
+            {
+              tileid = "6",
+              duration = "80"
+            },
+            {
+              tileid = "8",
+              duration = "80"
+            }
+          }
+        },
+        {
+          id = 1,
+          animation = {
+            {
+              tileid = "1",
+              duration = "80"
+            },
+            {
+              tileid = "3",
+              duration = "80"
+            },
+            {
+              tileid = "5",
+              duration = "80"
+            },
+            {
+              tileid = "7",
+              duration = "80"
+            },
+            {
+              tileid = "9",
+              duration = "80"
+            }
+          }
+        },
+        {
+          id = 10,
+          animation = {
+            {
+              tileid = "10",
+              duration = "80"
+            },
+            {
+              tileid = "12",
+              duration = "80"
+            },
+            {
+              tileid = "14",
+              duration = "80"
+            },
+            {
+              tileid = "16",
+              duration = "80"
+            },
+            {
+              tileid = "18",
+              duration = "80"
+            }
+          }
+        },
+        {
+          id = 11,
+          animation = {
+            {
+              tileid = "11",
+              duration = "80"
+            },
+            {
+              tileid = "13",
+              duration = "80"
+            },
+            {
+              tileid = "15",
+              duration = "80"
+            },
+            {
+              tileid = "17",
+              duration = "80"
+            },
+            {
+              tileid = "19",
+              duration = "80"
+            }
+          }
+        }
+      }
     }
   },
   layers = {
@@ -304,7 +424,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -320,7 +440,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -336,7 +456,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -352,7 +472,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -375,7 +495,7 @@ return {
       properties = {},
       encoding = "base64",
       compression = "zlib",
-      data = "eJzt3UluJFUQBuBupj3jnnHfTPtm2kMDe8Yb2DewbwacADgBcAJgSyBkqUVXubuqMivfH+/7pNhYcjmVKr8hIvLlnTvrulvxVMXTFc9UPFvx3Mp/E1jG8xUvVLxY8VLFyxWvbHpFwJN6teK1itcr3qh4s+KtA37/ouJyhesCHu9exdsV71S8W/FexfsH/P5VxfUK1wXdLTH33a/4oOLDio8qPq745MTPZFzWS+NYYu77tOKzigcVn1d8UfHliZ95qHN/p2b+DlsvjenYPPJXFV9XfFPxbcV3Fd+vdI37nPs75TucZYbxVh6ZrmYYb0/NI7OOGeYOTndqHpl1JM8denvORx6ZpdmTnc8IeWR6sSc7nxHyyPRiTwa57MkgV+c9mboA3XXekyXXBf6lNgC51AYgl9oA5FIbgFxqA5Crc20ARrRkzrhzbQBGJGcMueSMIZecMeSaKWesP4xuZsoZ2+vTzUw5Y3t9yGWvD2N4cPfw35lprw/dzLTXh25m2usDzEy9EXKpN0Iu9UbIpd4IudQbjyd3wNbUG483Q+7AGDU29cbjzZA7mGGMYk4z5A5mGKOY0wy5gxnGKOY0Q+5ghjGKOc2QO5hhjIKuZhijAAAAAG5cVFxufRHAUa4qrhf+TGMC5FpjTAAAAACYkXMMIJdzDCCXcwwgl3MMYLeEvaVzDGC3hL2lcwxgt4S9pXMMSFgnbsHekgQJ68Qt2FuSIGGduAV7SxJYJ+5mb0kC60TIZZ0IuawTAQAAYDn6vCCX/1/IpU8TcunThFz6NCGXPk3IpU8TcunT5FTeCwi5ur4XUG0VcqmtQi61Vciltgq51FYhl9oq5FJbBQAAAOAQ+qwhV9c+a+alxx5y6bGHXHrsIZcee8ilxx5y6bGHXHrsAQBup14PudTrIZd6PeRSr4dc6vWQa+Z6/Q8VP1b8tPWFwJFmrtf/XPFLxa9bXwg0tWZ967eK3yv+WOjzWJbzMfKtWd/6s+Kvir8X+rwndW/Hz+QMH+V8jHwd61v3d/xMzpCOOta3duUMD2H+JkXX+tb/c4aHMH+TYub61j6nzt9wLjPXt25zyvwNAAAAAAAAAJ14vglyeb4JgNE4FxxyORcccnU8NwFm0fHcBJjFKOcmqPHA4UY5N0GNBw7n3AS2pP4BudQ/IJf6B13NsLZU/6CrGdaWo9Q/YGkzrC1HqX/A0mZYW6p/0JW1JeSytoRc1pYAAAAAAAAAAAB0MMPz2NDVDM9jQ1czPI8NXc3wPDZ05XlsyJX+PLb8GzNLfx5b/g1yyb9BLvk3yCX/BrnS828ws/T8GwAAcLuLisutL6IhvTycw1XF9dYX0ZBeHsill4fuOq8x9fLQXec1pl4euuu8xtTLQ3ed15h6eejOGhNyWWMur3NOkLFYYy6vc04QuuucE4TuOucEoTs5QcglJwi55AQBADxjD8k8Yw8AAAAAAAAAAAAAAAAAAPNwPgDkcj7Af7x7hEOY98bi/3c/9+ZR5r2xeHfQfu4No/PuoP3cG0bn3UH7uTeMzruD9nNveNiI+RDvDtrPveFhI+ZDvDtov+R7M+JckU4+hHMZca5IJx/CuZgrlicfwrmYK5YnH8K5mCuWl5wPIYu5AnKZKwAAAAAA4Dy2OvvHmUNwuq3O/hnpzKGbscR48njGXUZzM5aMMp6MbKRx90kZc1iL79b6EsccMvhuAQAAAAAAAAAAAAAwin8AW/06NQ=="
+      data = "eJzt3bmOJEUQBuCe5nBmHE6f0+f0OX1YwOd8U+AJgCcAngBwCYSQVrvTw3R3VVf+kd8nhTm7pVJ1HhFRWbvduq4q9hVPVDxZ8VTF0yv/n8Aynql4tuK5iucrXqh4cdMrAu7rpYqXK16peLXitYrXj/j7q5q89/s1rgz4P29UvFnxVsXbFe9UvHvE31/Xb/fG7xeOtsTc917F+xUfVHxY8VHFx2dfGaOyXhrHEnPfJxWfVjyo+Kzi84ovzr6y41z6mZr5GbZeGtOpeeQvK76q+Lrim4pvK75b6RoPufQz5RnOMsN4K49MVzOMt+fmkVnHDHMH5zs3j8w6kucOvT2XI4/M0uzJLmeEPDK92JNdzgh5ZHqxJ4Nc9mSQq/OeTF2A7jrvyZLrAv9QG4BcagOQS20AcqkNQC61AcjVuTYAI1oyZ9y5NgAjkjOGXHLGkEvOGHLNlDPWH0Y3M+WM7fXpZqacsb0+5LLXhzE8uDr+b2ba60M3M+31oZuZ9voAM1NvhFzqjZBLvRFyqTdCLvXG08kdsDX1xtPNkDswRo1NvfF0M+QOZhijmNMMuYMZxijmNEPuYIYxijnNkDuYYYxiTjPkDmYYo6CrGcYoAAAAgP9c7Xe7/X7rqwBOcV2/3ZuFf7/GBMi1xpgAAAAAMCvnGEAm5xhALucYQC7nGMDtEs7Ic44B3C5hb+kcA7hdwt7SOQYkrBO3YG9JgoR14hbsLUmQsE7cgr0lCawTb2dvSQLrRMhlnQi5rBMBAABgOfq8IJffL+TSpwm59GlCLn2akEufJuTSpwm59GlyLt8FhFxdvwuotgq51FYhl9oq5FJbhVxqq5BLbRVyqa0CAAAAcAx91pCra58189JjD7n02EMuPfaQS4895NJjD7n02EMuPfYAAHdTr4dc6vWQS70ecqnXQy71esg1c73++4ofKn7c+kLgRDPX63+q+Lnil60vBJpas771a8VvFb8v9O8d49GcIY9zPka+Netbf1T8WfHXQv/efckZ3o/zMfJ1rG8tkTM0f5Og41x1W87wGB3vCT11rW89mjM8Rtd7Qj8z17cOOXf+hkuZub51l3PmbwAAAAAAAADoxPtNkMv7TQCMxrngkMu54JCr47kJMAtnBECuUc4IUOOB441yboIaDxzPuQlsTf0DMql/QC71D7qaobdG/YOuZlhbjlL/gKXNsLYcpf4BS5thban+QVfWlpDL2hJyWVsCAAAAAAAAAADQwQzvY0NXM7yPDV3N8D42dDXD+9jQlfexIVf6+9jyb8ws/X1s+TfIJf8GueTfIJf8G+RKz7/BzNLzbwAAwN2u9rvdfr/1VfSkl4e1XddDduP3uzi9PJBLLw/dde4X18tDd53XmHp56K7zGlMvD911XmPq5aE7a0zIZY25jq45QcZijbm8zjlB6K5zThC665wThO7kBCGXnCDkkhMEAPCOPSTzjj0AAAAAAAAAAAAAAAAAAMzD+QCQy/kA/+r8PWKWZ94bi9/vYe7N48x7Y/HtoMPcG0bn20GHuTeMzreDDnNvGJ1vBx3m3vCwEfMhvh10mHvDw0bMh/h20GHJ92bEuSKdfAiXMuJckU4+hEsxVyxPPoRLMVcsTz6ESzFXLC85H0IWcwXkMlcAAAAAAMBlbHX2jzOH4Hxbnf0z0plDxpL7c68YzUhjyegS75Uxh7V4ttaXOOaQwbMFAAAAAAAAAAAAAMAo/gbOmBBV"
     },
     {
       type = "tilelayer",
@@ -384,7 +504,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -400,7 +520,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -416,7 +536,7 @@ return {
       y = 0,
       width = 240,
       height = 240,
-      visible = true,
+      visible = false,
       opacity = 1,
       offsetx = 0,
       offsety = 0,

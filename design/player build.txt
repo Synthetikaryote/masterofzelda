@@ -4,6 +4,32 @@ how to read this:
 
 default attributes:
 
+build = {
+	"Melee damage" = {
+		description = "Points in this category affect damage dealt from melee range.",
+		enabled = false,
+		children = {
+			"Double damage" = {
+				enabled = false,
+				description = "this doubles a character’s melee damage"
+			}
+			"Half mana cost" = {
+				enabled = false,
+				description = ""
+			}
+		}
+	}
+}
+
+1 ranged damage (includes spells)
+	-double ranged damage
+	-half mana cost
+1 healing
+	-double healing
+	-half mana cost
+1 damage taken
+	-half damage taken
+	+double damage taken
 invincibility duration
 	-double invincibility duration
 	+half
@@ -32,18 +58,6 @@ melee range
 ranged range
 	-double ranged range
 healing range
-1 melee damage (includes spells)
-	-double melee damage
-	-half mana cost
-1 ranged damage (includes spells)
-	-double ranged damage
-	-half mana cost
-1 healing
-	-double healing
-	-half mana cost
-1 damage taken
-	-half damage taken
-	+double damage taken
 
 optional attributes:
 
