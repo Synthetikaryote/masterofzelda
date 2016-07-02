@@ -48,11 +48,11 @@ function Player:update()
     end
 
     if self.isAlive then
-        local joystick = love.joystick.getJoysticks()[1]
-        local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
+        local gamepad = love.joystick.getJoysticks()[1]
+        local jx, jy = gamepad and gamepad:getGamepadAxis("leftx") or 0, gamepad and gamepad:getGamepadAxis("lefty") or 0
         if math.abs(jx) < 0.06 then jx = 0 else jx = (jx - 0.06) / (1 - 0.06) end
         if math.abs(jy) < 0.06 then jy = 0 else jy = (jy - 0.06) / (1 - 0.06) end
-        local v = joystick and vector(jx, jy) or vector(0, 0)
+        local v = gamepad and vector(jx, jy) or vector(0, 0)
         local moving = false
         for k, data in pairs(dirData) do
             local key, dv = data[1], data[2]
@@ -77,7 +77,8 @@ function Player:update()
                 self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
             end
             if len > 1 then v = v / len end
-            v = v * self.moveSpeed * love.timer.getDelta() * timeScale * ((keyboard["lshift"] or keyboard["rshift"]) and 10 or 1)
+            local running = keyboard["lshift"] or keyboard["rshift"] or gamepad and gamepad:getGamepadAxis("triggerright") > 0.05
+            v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (running and 10 or 1)
             self:move(self.p + v)
         end
 
@@ -111,12 +112,12 @@ function Player:draw()
     Character.draw(self)
 end
 function Player:keypressed(key, scancode, isRepeat)
-    self:checkAttack(scancode, nil)
+    self:checkInput(scancode, nil)
 end
 function Player:gamepadpressed(gamepad, button)
-    self:checkAttack(nil, button)
+    self:checkInput(nil, button)
 end
-function Player:checkAttack(scancode, button)
+function Player:checkInput(scancode, button)
     if scancode == "space" or button == "a" then
         if self.animationName ~= "polearm" then
             self.animationName = "polearm"

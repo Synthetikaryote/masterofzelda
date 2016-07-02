@@ -142,17 +142,21 @@ function visitCharsInRect(topLeft, bottomRight, f)
     end
 end
 
+function checkInput(scancode, button)
+	if scancode == "escape" then
+        love.event.quit()
+    elseif scancode == "pause" or button == "start" then
+		isPaused = not isPaused
+		timeScale = isPaused and 0 or 1
+	elseif scancode == "f3" or button == "back" then
+        showDebug = not showDebug
+	end
+end
+
 function love.keypressed(key, scancode, isRepeat)
     keyboard[scancode] = 1
 
-    if scancode == "escape" then
-        love.event.quit()
-    elseif scancode == "pause" then
-        isPaused = not isPaused
-        timeScale = isPaused and 0 or 1
-    elseif scancode == "f3" then
-        showDebug = not showDebug
-    end
+    checkInput(scancode, nil)
 
     if isPaused then
         return
@@ -171,9 +175,16 @@ function love.gamepadpressed(gamepad, button)
         gamepads[id] = {}
     end
     gamepads[id][button] = 1
+    
+    checkInput(nil, button)
+
+    if isPaused then
+    	return
+    end
 
     player:gamepadpressed(gamepad, button)
 end
+
 function love.gamepadreleased(gamepad, button)
     local id = gamepad:getID()
     if gamepads[id] == nil then
