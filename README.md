@@ -12,7 +12,9 @@ These graphics are not final; just in use to get things working.
 
 ## Building / playing
 
-This game is written in Lua for the [LÖVE](https://love2d.org/) 2D game framework.  We'll package it when it's in a more playable state, but for now, we are building and testing directly from Sublime Text 3 with this LOVE.sublime-build file:
+This game is written in Lua for the [LÖVE](https://love2d.org/) 2D game framework.  To run the [releases](https://github.com/Synthetikaryote/masterofzelda/releases), install [LÖVE](https://love2d.org/) and that should associate .love files with it automatically.  You can then run .love files like any other program.
+
+If you want to fork and/or hack on the game with Sublime Text 3, you can build and run the game directly from Sublime Text 3 with this LOVE.sublime-build file:
 
 ```JSON
 {
@@ -23,7 +25,7 @@ This game is written in Lua for the [LÖVE](https://love2d.org/) 2D game framewo
 }
 ```
 
-To use this in Sublime Text 3, click "Tools" -> "Build System" -> "New Build System...", replace everything in the resulting document that opens with the above, edit the path to your love executable, save in the default location as "LOVE.sublime-build", and you should be able to then use "Tools" -> "Build" to build and run when you have main.lua open.
+To use this, in Sublime Text 3, click "Tools" -> "Build System" -> "New Build System...", replace everything in the resulting document that opens with the above, edit the path to your love executable, save in the default location as "LOVE.sublime-build", and you should be able to then use "Tools" -> "Build" to build and run when you have main.lua open.
 
 Alternatively, the following batch script will build and run the game if you have it and 7za in this repo's root directory.  Edit the path to your love executable.
 
