@@ -58,7 +58,7 @@ function Enemy:update()
                     self.nextPlayerHitQueued = false
                     self.animationName = "walk"
                     local mult = self.moveSpeed * love.timer.getDelta() * timeScale
-                    self:move(Vector(self.p.x + vx * mult, self.p.y + vy * mult))
+                    self:move(vector(self.p.x + vx * mult, self.p.y + vy * mult))
                 else
                     self.nextPlayerHitQueued = false
                     self.animationName = "walk"

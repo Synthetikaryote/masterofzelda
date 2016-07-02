@@ -2,16 +2,16 @@ local newAniDir = 0
 local deg = 0
 
 local dirData = {
-    {"up", Vector(0, -1)},
-    {"left", Vector(-1, 0)},
-    {"down", Vector(0, 1)},
-    {"right", Vector(1, 0)}
+    {"up", vector(0, -1)},
+    {"left", vector(-1, 0)},
+    {"down", vector(0, 1)},
+    {"right", vector(1, 0)}
 }
 local gamepadDirData = {
-    {"dpup", Vector(0, -1)},
-    {"dpleft", Vector(-1, 0)},
-    {"dpdown", Vector(0, 1)},
-    {"dpright", Vector(1, 0)}
+    {"dpup", vector(0, -1)},
+    {"dpleft", vector(-1, 0)},
+    {"dpdown", vector(0, 1)},
+    {"dpright", vector(1, 0)}
 }
 
 Player = class(Character)
@@ -39,7 +39,7 @@ function Player:update()
         end
     end
     if self.respawnQueued and love.timer.getTime() * timeScale >= self.respawnTime and #self.coroutines == 0 then
-        self:move(Vector(1000, 1000))
+        self:move(vector(1000, 1000))
         self.hp = self.maxHp
         self.deaths = self.deaths + 1
         self.respawnQueued = false
@@ -52,7 +52,7 @@ function Player:update()
         local jx, jy = joystick and joystick:getAxis(1) or 0, joystick and joystick:getAxis(2) or 0
         if math.abs(jx) < 0.06 then jx = 0 else jx = (jx - 0.06) / (1 - 0.06) end
         if math.abs(jy) < 0.06 then jy = 0 else jy = (jy - 0.06) / (1 - 0.06) end
-        local v = joystick and Vector(jx, jy) or Vector(0, 0)
+        local v = joystick and vector(jx, jy) or vector(0, 0)
         local moving = false
         for k, data in pairs(dirData) do
             local key, dv = data[1], data[2]
@@ -85,7 +85,7 @@ function Player:update()
             if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
                 self.nextHitQueued = false
                 local animation = self.sprite.animations[self.animationName]
-                visitCharsInRadius(Vector(self.p.x + self.attackDist * 0.5 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.5, function(c)
+                visitCharsInRadius(vector(self.p.x + self.attackDist * 0.5 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.5, function(c)
                     if c ~= self then
                         c:gotHit(self, self.attackDamage, 0.5, 90, 0.5)
                         if c.hp <= 0 then

@@ -11,10 +11,11 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.hp = hp
     self.moveSpeed = moveSpeed
     self.facingDir = 0
-    self.p = Vector(0, 0)
+    self.p = vector(0, 0)
+    self.mapP = vector(0, 0)
     self.attackEnds = 0
     self.damageEnds = 0
-    self.xyMapP = Vector(0, 0)
+    self.xyMapP = vector(0, 0)
     self.invincibilityTime = invincibilityTime
     self.nextDamageable = 0
     self.attackDist = attackDist
@@ -94,7 +95,17 @@ function Character:lateDraw()
     end
 end
 function Character:move(p)
+    local mapX, mapY = map:convertScreenToWorld(p.x, p.y)
+    mapX, mapY = math.floor(mapX) + 1, math.floor(mapY) + 1
+    local tileIndex = nil
+    if obstacles.data[mapY] then
+        tileIndex = obstacles.data[mapY][mapX]
+    end
+    if tileIndex then
+        return
+    end
     self.p = p
+    self.mapP = vector(mapX, mapY)
     local x = math.floor(p.x / xyMapXWidth)
     local y = math.floor(p.y)
     if self.xyMapP.x ~= x or self.xyMapP.y ~= y then
@@ -103,7 +114,7 @@ function Character:move(p)
                 xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
             end
         end
-        self.xyMapP = Vector(x, y)
+        self.xyMapP = vector(x, y)
         if xyMap[y] == nil then
             xyMap[y] = {}
         end
