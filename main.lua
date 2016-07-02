@@ -41,11 +41,6 @@ function love.load()
     map = sti.new("assets/maps/savageland.lua", { })
     obstacles = map.layers["level 1 obstacles"]
 
-    for k, v in pairs(map.tiles) do
-        v.sx = 5
-        v.sy = 5
-    end
-
     for k, layer in pairs(map.layers) do
         function layer:update(dt)
             mapP.x = -player.p.x + love.graphics.getWidth() * 0.5
@@ -107,7 +102,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 20000
+    local numOrcs = 900
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
@@ -230,10 +225,10 @@ function love.draw()
             "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
             "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 130)
         print_r(gamepads, 10, 270)
+        print_r(map.layers["level 1 obstacles"].data[51][230], 300, 0, 3)
 
         print_r(log, 10, 370)
     end
-    log = "hello"
 
     love.graphics.setFont(font48)
     love.graphics.print("Kills: "..player.killCount, 40, 40)
