@@ -32,4 +32,4 @@ Alternatively, the following batch script will build and run the game if you hav
 "C:\tools\love\love.exe" masterofzelda.love
 ```
 
-Also, don't forget to "git submodule update --init"!  STI is used for loading the map(s) made in Tiled.
+Also, don't forget to "git submodule update --init"!  [STI](https://github.com/karai17/Simple-Tiled-Implementation/) is used as a submodule for loading the map(s) made in [Tiled](https://github.com/bjorn/tiled).
