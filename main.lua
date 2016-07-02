@@ -93,7 +93,7 @@ function love.load()
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
     player = Player("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
-    player:move(vector(1000, 1000))
+    player:move(vector(5088, 4000))
     characters[player.id] = player
 
     local orcSprite = Sprite("assets/orc.png", {
@@ -108,11 +108,13 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 1
+    local numOrcs = 20000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
-        orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
+        repeat
+            orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
+        until (orc.p - player.p):lenSq() > 400 * 400
         characters[orc.id] = orc
     end
 end

@@ -39,7 +39,7 @@ function Player:update()
         end
     end
     if self.respawnQueued and love.timer.getTime() * timeScale >= self.respawnTime and #self.coroutines == 0 then
-        self:move(vector(1000, 1000))
+        self:move(vector(5088, 4000))
         self.hp = self.maxHp
         self.deaths = self.deaths + 1
         self.respawnQueued = false
