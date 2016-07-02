@@ -55,8 +55,7 @@ function love.load()
         end
     end
 
-    map:addCustomLayer("Sprite Layer", 6)
-    local spriteLayer = map.layers["Sprite Layer"]
+    local spriteLayer = map.layers["level 1 sprites"]
 
     -- update callback for custom layers
     function spriteLayer:update(dt)
