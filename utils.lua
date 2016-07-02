@@ -1,18 +1,23 @@
 -- print an object's contents.  if it's a table, it will print it recursively
-function print_r (t, x, y)
+function print_r (t, x, y, maxDepth)
+    local maxDepth = maxDepth or -1
     local print_r_cache={}
-    local function sub_print_r(t,indent)
+    local function sub_print_r(t,indent, maxDepth)
+        if maxDepth == 0 then return end
         if (print_r_cache[tostring(t)]) then
-            print(indent.."*"..tostring(t))
+            love.graphics.print(indent.."*"..tostring(t), x, y)
+            y = y + 20
         else
             print_r_cache[tostring(t)]=true
             if (type(t)=="table") then
                 for pos,val in pairs(t) do
                     if (type(val)=="table") then
-                        love.graphics.print(indent.."["..pos.."] => "..tostring(t).." {", x, y)
-                        y = y + 20
-                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
-                        love.graphics.print(indent..string.rep(" ",string.len(pos)+6).."}", x, y)
+                        love.graphics.print(indent.."["..pos.."] => "..tostring(t).." {"..(maxDepth == 1 and "...}" or ""), x, y)
+                        if maxDepth > 1 then
+                            y = y + 20
+                            sub_print_r(val,indent..string.rep(" ",string.len(pos)+8), maxDepth - 1)
+                            love.graphics.print(indent..string.rep(" ",string.len(pos)+6).."}", x, y)
+                        end
                         y = y + 20
                     elseif (type(val)=="string") then
                         love.graphics.print(indent.."["..pos..'] => "'..val..'"', x, y)
@@ -31,11 +36,11 @@ function print_r (t, x, y)
     if (type(t)=="table") then
         love.graphics.print(tostring(t).." {", x, y)
         y = y + 20
-        sub_print_r(t,"  ")
+        sub_print_r(t,"  ", maxDepth - 1)
         love.graphics.print("}", x, y)
         y = y + 20
     else
-        sub_print_r(t,"  ")
+        sub_print_r(t,"  ", maxDepth - 1)
     end
     love.graphics.print("", x, y)
     y = y + 20

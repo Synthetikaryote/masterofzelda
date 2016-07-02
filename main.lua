@@ -1,5 +1,5 @@
 require "class"
-require "Vector"
+require "vector"
 require "sprite"
 require "character"
 require "player"
@@ -13,9 +13,10 @@ local sti = require "sti"
 timeScale = 1
 local isPaused = false
 local font12 = love.graphics.newFont(12)
+local font48 = love.graphics.newFont(48)
 local font72 = love.graphics.newFont(72)
 characters = {}
-mapP = Vector(0, 0)
+mapP = vector(0, 0)
 keyboard = {}
 gamepads = {}
 xyMap = {}
@@ -29,6 +30,8 @@ bottomYOffset = 0
 xyMapXWidth = love.graphics.getWidth() * 0.1
 coroutines = {}
 log = ""
+obstacles = nil
+showDebug = false
 
 showAggro = false
 showAttackDist = false
@@ -36,6 +39,8 @@ showAttackDist = false
 local numVisited = 0
 function love.load()
     map = sti.new("assets/maps/savageland.lua", { })
+    obstacles = map.layers["level 1 obstacles"]
+
     for k, v in pairs(map.tiles) do
         v.sx = 5
         v.sy = 5
@@ -60,8 +65,8 @@ function love.load()
     -- draw callback for custom layer
     function spriteLayer:draw()
         numVisited = 0
-        local topLeft = Vector(-mapP.x - leftXOffset, -mapP.y - topYOffset)
-        local bottomRight = Vector(-mapP.x + love.graphics.getWidth() + rightXOffset, -mapP.y + love.graphics.getHeight() + bottomYOffset)
+        local topLeft = vector(-mapP.x - leftXOffset, -mapP.y - topYOffset)
+        local bottomRight = vector(-mapP.x + love.graphics.getWidth() + rightXOffset, -mapP.y + love.graphics.getHeight() + bottomYOffset)
         visitCharsInRect(topLeft, bottomRight, function(c)
             numVisited = numVisited + 1
             c:earlyDraw()
@@ -88,7 +93,7 @@ function love.load()
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
     player = Player("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
-    player:move(Vector(1000, 1000))
+    player:move(vector(1000, 1000))
     characters[player.id] = player
 
     local orcSprite = Sprite("assets/orc.png", {
@@ -103,17 +108,17 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 20000
+    local numOrcs = 100
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,                  50,             20,             0.45,               10,             300,        10)
-        orc:move(Vector(math.random(0, 7680), math.random(0, 7680)))
+        orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
         characters[orc.id] = orc
     end
 end
 
 function visitCharsInRadius(p, r, f)
-    visitCharsInRect(Vector(p.x - r, p.y - r), Vector(p.x + r, p.y + r), function(c)
+    visitCharsInRect(vector(p.x - r, p.y - r), vector(p.x + r, p.y + r), function(c)
         if (c.p - p):lenSq() < r * r then
             f(c)
         end
@@ -121,8 +126,8 @@ function visitCharsInRadius(p, r, f)
 end
 
 function visitCharsInRect(topLeft, bottomRight, f)
-    topLeft = Vector(math.floor(topLeft.x / xyMapXWidth), math.floor(topLeft.y))
-    bottomRight = Vector(math.floor(bottomRight.x / xyMapXWidth), math.floor(bottomRight.y))
+    topLeft = vector(math.floor(topLeft.x / xyMapXWidth), math.floor(topLeft.y))
+    bottomRight = vector(math.floor(bottomRight.x / xyMapXWidth), math.floor(bottomRight.y))
     for y = topLeft.y, bottomRight.y do
         if xyMap[y] then
             for x = topLeft.x, bottomRight.x do
@@ -144,6 +149,8 @@ function love.keypressed(key, scancode, isRepeat)
     elseif scancode == "pause" then
         isPaused = not isPaused
         timeScale = isPaused and 0 or 1
+    elseif scancode == "f3" then
+        showDebug = not showDebug
     end
 
     if isPaused then
@@ -204,12 +211,24 @@ function love.draw()
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
 
-    love.graphics.print("fps "..love.timer.getFPS().." x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
-        "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
-        "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime, 400, 300)
+    love.graphics.print("fps "..love.timer.getFPS(), 10, 10)
+    if showDebug then
+        love.graphics.print("x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
+            "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
+            "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
+            "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 130)
+        print_r(gamepads, 10, 270)
 
-    print_r(log, 0, 0)
-    print_r(gamepads, 0, 0)
+        print_r(log, 10, 370)
+    end
+    log = "hello"
+
+    love.graphics.setFont(font48)
+    love.graphics.print("Kills: "..player.killCount, 40, 40)
+    love.graphics.print("Deaths: "..player.deaths, 40, 110)
+    love.graphics.setFont(font12)
+
+    -- print_r(obstacles, 0, 0, 4)
 
     if isPaused then
         love.graphics.setFont(font72)

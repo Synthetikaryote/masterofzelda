@@ -11,10 +11,11 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.hp = hp
     self.moveSpeed = moveSpeed
     self.facingDir = 0
-    self.p = Vector(0, 0)
+    self.p = vector(0, 0)
+    self.mapP = vector(0, 0)
     self.attackEnds = 0
     self.damageEnds = 0
-    self.xyMapP = Vector(0, 0)
+    self.xyMapP = vector(0, 0)
     self.invincibilityTime = invincibilityTime
     self.nextDamageable = 0
     self.attackDist = attackDist
@@ -25,20 +26,32 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.despawnTime = 0
     self.despawnQueued = false
     self.isAlive = true
+    self.coroutines = {}
 end
 function Character:update()
-    if self.despawnQueued and love.timer.getTime() * timeScale >= self.despawnTime then
+    for i = #self.coroutines, 1, -1 do
+        local c = self.coroutines[i]
+        if coroutine.resume(c) == false then
+            table.remove(self.coroutines, i)
+        end
+    end
+    if self.despawnQueued and love.timer.getTime() * timeScale >= self.despawnTime and #self.coroutines == 0 then
         if xyMap[self.xyMapP.y] ~= nil then
             if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
                 xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
             end
         end
         characters[self.id] = nil
+        self = nil
+        return
     end
     local animation = self.sprite.animations[self.animationName]
     if love.timer.getTime() * timeScale - self.aniLastChange > 1 / animation[3] then
         self.aniFrame = self.aniLooping and ((self.aniFrame + 1) % animation[2]) or math.min(self.aniFrame + 1, animation[2] - 1)
         self.aniLastChange = love.timer.getTime() * timeScale
+    end
+    for k, v in pairs(self.coroutines) do
+
     end
 end
 function Character:earlyDraw()
@@ -82,7 +95,17 @@ function Character:lateDraw()
     end
 end
 function Character:move(p)
+    local mapX, mapY = map:convertScreenToWorld(p.x, p.y)
+    mapX, mapY = math.floor(mapX) + 1, math.floor(mapY) + 1
+    local tileIndex = nil
+    if obstacles.data[mapY] then
+        tileIndex = obstacles.data[mapY][mapX]
+    end
+    if tileIndex then
+        return
+    end
     self.p = p
+    self.mapP = vector(mapX, mapY)
     local x = math.floor(p.x / xyMapXWidth)
     local y = math.floor(p.y)
     if self.xyMapP.x ~= x or self.xyMapP.y ~= y then
@@ -91,7 +114,7 @@ function Character:move(p)
                 xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
             end
         end
-        self.xyMapP = Vector(x, y)
+        self.xyMapP = vector(x, y)
         if xyMap[y] == nil then
             xyMap[y] = {}
         end
@@ -109,12 +132,14 @@ function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, s
         self.stunEndTime = (love.timer.getTime() + stunDuration) * timeScale
         local dp = source.p - self.p
         local n = dp:normalized()
-        table.insert(coroutines, coroutine.create(function()
+        table.insert(self.coroutines, coroutine.create(function()
             local knockbackSpeed = 500
-            while knockbackDist > 0 do
+            while knockbackDist > 0 and self ~= nil do
                 local dist = math.min(knockbackDist, love.timer.getDelta() * timeScale * knockbackSpeed)
                 knockbackDist = knockbackDist - dist
-                self:move(self.p + -n * dist)
+                if self ~= nil then
+                    self:move(self.p + -n * dist)
+                end
                 coroutine.yield()
             end
         end))
