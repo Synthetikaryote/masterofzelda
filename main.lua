@@ -5,6 +5,7 @@ require "character"
 require "player"
 require "enemy"
 require "utils"
+require "buildMenu"
 
 local sti = require "sti"
 
@@ -36,6 +37,8 @@ showDebug = false
 showAggro = false
 showAttackDist = false
 
+showBuildMenu = false
+
 local numVisited = 0
 function love.load()
     map = sti.new("assets/maps/savageland.lua", { })
@@ -49,13 +52,10 @@ function love.load()
             self.y = mapP.y
         end
     end
-
     local spriteLayer = map.layers["level 1 sprites"]
-
     -- update callback for custom layers
     function spriteLayer:update(dt)
     end
-
     -- draw callback for custom layer
     function spriteLayer:draw()
         numVisited = 0
@@ -111,6 +111,8 @@ function love.load()
         until (orc.p - player.p):lenSq() > 400 * 400
         characters[orc.id] = orc
     end
+
+    buildMenu = BuildMenu()
 end
 
 function visitCharsInRadius(p, r, f)
@@ -208,6 +210,10 @@ function love.update()
     end
 
     map:update(love.timer.getDelta() * timeScale)
+
+    if showBuildMenu then
+        buildMenu:update()
+    end
 end
 
 function love.draw()
@@ -225,7 +231,6 @@ function love.draw()
             "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
             "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 130)
         print_r(gamepads, 10, 270)
-        print_r(map.layers["level 1 obstacles"].data[51][230], 300, 0, 3)
 
         print_r(log, 10, 370)
     end
@@ -234,6 +239,10 @@ function love.draw()
     love.graphics.print("Kills: "..player.killCount, 40, 40)
     love.graphics.print("Deaths: "..player.deaths, 40, 110)
     love.graphics.setFont(font12)
+
+    if showBuildMenu then
+        buildMenu:draw()
+    end
 
     -- print_r(obstacles, 0, 0, 4)
 
@@ -246,7 +255,6 @@ function love.draw()
 
     -- print_r(player.animationQuads, 800, -2600)
 end
-
 
 function love.run()
  

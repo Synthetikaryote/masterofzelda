@@ -1,6 +1,6 @@
 -- print an object's contents.  if it's a table, it will print it recursively
 function print_r (t, x, y, maxDepth)
-    local maxDepth = maxDepth or -1
+    local maxDepth = maxDepth or 20
     local print_r_cache={}
     local function sub_print_r(t,indent, maxDepth)
         if maxDepth == 0 then return end
@@ -12,7 +12,7 @@ function print_r (t, x, y, maxDepth)
             if (type(t)=="table") then
                 for pos,val in pairs(t) do
                     if (type(val)=="table") then
-                        love.graphics.print(indent.."["..pos.."] => "..tostring(t).." {"..(maxDepth == 1 and "...}" or ""), x, y)
+                        love.graphics.print(indent.."["..pos.."] => "..tostring(t).." {"..(maxDepth == 1 and "...(maxDepth reached)...}" or ""), x, y)
                         if maxDepth > 1 then
                             y = y + 20
                             sub_print_r(val,indent..string.rep(" ",string.len(pos)+8), maxDepth - 1)
