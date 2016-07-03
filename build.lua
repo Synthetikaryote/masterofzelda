@@ -1,7 +1,12 @@
+--[[
+how to read this:
+"-" before something means it will cost points to add to your character (benefits)
+]]"+" before something means it will give points to your character build (detriments)
+
 build = {
 	meleeDamage = {
 		name = "Melee damage",
-		description = "Points in this category affect your damage dealt from melee range. This affects all melee-range sources.",
+		description = "Points in this category affect your damage dealt from melee range.",
 		children = {
 			doubleDamage = {
 				enabled = false,
@@ -17,12 +22,12 @@ build = {
 	},
 	rangedDamage = {
 		name = "Ranged damage",
-		description = "Points in this category affect your damage dealt from  range. This affects all melee-range sources.",
+		description = "Points in this category affect damage dealt by your abilities which have greater range than melee.",
 		children = {
 			doubleDamage = {
 				enabled = false,
 				name = "Double damage",
-				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
+				description = "This doubles damage dealt by your abilities which have greater range than melee."
 			},
 			halfManaCost = {
 				enabled = false,
@@ -33,10 +38,6 @@ build = {
 	}
 }
 --[[
-
-how to read this:
-"-" before something means it will cost points to add to your character (benefits)
-"+" before something means it will give points to your character build (detriments)
 
 default attributes:
 
