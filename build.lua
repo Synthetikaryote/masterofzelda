@@ -5,29 +5,122 @@ how to read this:
 ]]
 
 build = {
-	["Melee damage"] = {
-		description = "Points in this category affect your damage dealt from melee range.",
+	["Melee"] = {
+		description = "This enables abilities that affect only melee range.",
+		enabled = true,
+		points = -1,
 		children = {
 			["Double damage"] = {
+				description = "This doubles damage dealt by abilities that affect only melee range.",
 				enabled = false,
-				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
+				points = -1
+			},
+			group1 = {
+				children = {
+					["Double range"] = {
+						description = "This doubles melee range.",
+						enabled = false,
+						points = -1
+					},
+					["Triple range"] = {
+						description = "This triples melee range.",
+						enabled = false,
+						points = -2
+					}
+				}
 			},
 			["Half mana cost"] = {
+				description = "This halves mana cost of abilities that affect only melee range.",
 				enabled = false,
-				description = "This reduces mana cost of abilities that affect only melee range by 50%."
+				points = -1
 			}
 		}
 	},
-	["Ranged damage"] = {
-		description = "Points in this category affect damage dealt by your abilities which have greater range than melee.",
+	["Non-melee"] = {
+		description = "This enables abilities that can affect a greater range than melee range.",
+		enabled = true,
+		points = -1,
 		children = {
 			["Double damage"] = {
+				description = "This doubles damage dealt by abilities that can affect a greater range than melee range.",
 				enabled = false,
-				description = "This doubles damage dealt by your abilities which have greater range than melee."
+				points = -1
 			},
 			["Half mana cost"] = {
+				description = "This halves mana cost of abilities that can affect a greater range than melee range.",
 				enabled = false,
-				description = "This reduces mana cost of abilities that affect only melee range by 50%."
+				points = -1
+			}
+		}
+	},
+	["Healing"] = {
+		description = "This enables abilities that heal.",
+		enabled = true,
+		points = -1,
+		children = {
+			["Double"] = {
+				description = "This doubles the healing effect of all abilities that heal.",
+				enabled = false,
+				points = -1
+			},
+			group1 = {
+				children = {
+					["Half mana cost"] = {
+						description = "This halves mana cost of abilities that only heal.",
+						enabled = false,
+						points = -1
+					},
+					["Double mana cost"] = {
+						description = "This doubles mana cost of abilities that only heal.",
+						enabled = false,
+						points = 2
+					}
+				}
+			}
+		}
+	},
+	["Damage taken"] = {
+		description = "Points in this category affect damage taken.",
+		children = {
+			group1 = {
+				children = {
+					["Half"] = {
+						description = "This halves damage taken.",
+						enabled = false,
+						points = -1
+					},
+					["Double"] = {
+						description = "This doubles damage taken.",
+						enabled = false,
+						points = 1
+					}
+				}
+			}
+		}
+	},
+	["Invincibility duration"] = {
+		description = "Points in this category affect the duration of invincibility after taking damage.",
+		enabled = true,
+		points = -3,
+		children = {
+			group1 = {
+				children = {
+					["Double"] = {
+						description = "This doubles invincibility duration.",
+						enabled = false,
+						points = -2
+					},
+					["Half"] = {
+						description = "This halves invincibility duration.",
+						enabled = false,
+						points = 1
+					},
+					["Quarter"] = {
+						description = "This quarters invincibility duration.",
+						enabled = false,
+						points = 2
+					}
+				}
 			}
 		}
 	}
@@ -35,24 +128,18 @@ build = {
 --[[
 
 default attributes:
-
-1 ranged damage (includes spells)
-	-double ranged damage
-	-half mana cost
-1 healing
-	-double healing
-	-half mana cost
-1 damage taken
-	-half damage taken
-	+double damage taken
 invincibility duration
 	-double invincibility duration
 	+half
 		+quarter
-knockback
+knockback taken
 	-half knockback
-		-no knockback
+	-no knockback
 	+double knockback
+knockback dealt
+	+half knockback
+	+no knockback
+	-double knockback
 200 movement speed
 	-125% movement speed
 	+80% movement speed
@@ -67,9 +154,6 @@ no-mana heal and damage ability
 100 mana
 	-double mana
 	+no mana
-melee range
-	-double melee range
-	+no melee
 ranged range
 	-double ranged range
 healing range
