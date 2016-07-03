@@ -5,72 +5,84 @@ how to read this:
 ]]
 
 build = {
-	["Melee"] = {
+	{
+		name = "Melee",
 		description = "This enables abilities that affect only melee range.",
 		enabled = true,
 		points = -1,
 		children = {
-			["Double damage"] = {
+			{
+				name = "Double damage",
 				description = "This doubles damage dealt by abilities that affect only melee range.",
 				enabled = false,
 				points = -1
 			},
-			group1 = {
+			{
 				children = {
-					["Double range"] = {
+					{
+						name = "Double range",
 						description = "This doubles melee range.",
 						enabled = false,
 						points = -1
 					},
-					["Triple range"] = {
+					{
+						name = "Triple range",
 						description = "This triples melee range.",
 						enabled = false,
 						points = -2
 					}
 				}
 			},
-			["Half mana cost"] = {
+			{
+				name = "Half mana cost",
 				description = "This halves mana cost of abilities that affect only melee range.",
 				enabled = false,
 				points = -1
 			}
 		}
 	},
-	["Non-melee"] = {
+	{
+		name = "Non-melee",
 		description = "This enables abilities that can affect a greater range than melee range.",
 		enabled = true,
 		points = -1,
 		children = {
-			["Double damage"] = {
+			{
+				name = "Double damage",
 				description = "This doubles damage dealt by abilities that can affect a greater range than melee range.",
 				enabled = false,
 				points = -1
 			},
-			["Half mana cost"] = {
+			{
+				name = "Half mana cost",
 				description = "This halves mana cost of abilities that can affect a greater range than melee range.",
 				enabled = false,
 				points = -1
 			}
 		}
 	},
-	["Healing"] = {
+	{
+		name = "Healing",
 		description = "This enables abilities that heal.",
 		enabled = true,
 		points = -1,
 		children = {
-			["Double"] = {
+			{
+				name = "Double",
 				description = "This doubles the healing effect of all abilities that heal.",
 				enabled = false,
 				points = -1
 			},
 			group1 = {
 				children = {
-					["Half mana cost"] = {
+					{
+						name = "Half mana cost",
 						description = "This halves mana cost of abilities that only heal.",
 						enabled = false,
 						points = -1
 					},
-					["Double mana cost"] = {
+					{
+						name = "Double mana cost",
 						description = "This doubles mana cost of abilities that only heal.",
 						enabled = false,
 						points = 2
@@ -79,17 +91,20 @@ build = {
 			}
 		}
 	},
-	["Damage taken"] = {
+	{
+		name = "Damage taken",
 		description = "Points in this category affect damage taken.",
 		children = {
 			group1 = {
 				children = {
-					["Half"] = {
+					{
+						name = "Half",
 						description = "This halves damage taken.",
 						enabled = false,
 						points = -1
 					},
-					["Double"] = {
+					{
+						name = "Double",
 						description = "This doubles damage taken.",
 						enabled = false,
 						points = 1
@@ -98,24 +113,28 @@ build = {
 			}
 		}
 	},
-	["Invincibility duration"] = {
+	{
+		name = "Invincibility duration",
 		description = "Points in this category affect the duration of invincibility after taking damage.",
 		enabled = true,
 		points = -3,
 		children = {
 			group1 = {
 				children = {
-					["Double"] = {
+					{
+						name = "Double",
 						description = "This doubles invincibility duration.",
 						enabled = false,
 						points = -2
 					},
-					["Half"] = {
+					{
+						name = "Half",
 						description = "This halves invincibility duration.",
 						enabled = false,
 						points = 1
 					},
-					["Quarter"] = {
+					{
+						name = "Quarter",
 						description = "This quarters invincibility duration.",
 						enabled = false,
 						points = 2

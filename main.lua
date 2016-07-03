@@ -13,9 +13,10 @@ local sti = require "sti"
 
 timeScale = 1
 local isPaused = false
-local font12 = love.graphics.newFont(12)
-local font48 = love.graphics.newFont(48)
-local font72 = love.graphics.newFont(72)
+font12 = love.graphics.newFont(12)
+font18 = love.graphics.newFont(18)
+font48 = love.graphics.newFont(48)
+font72 = love.graphics.newFont(72)
 characters = {}
 mapP = vector(0, 0)
 keyboard = {}
@@ -145,8 +146,10 @@ function checkInput(scancode, button)
     elseif scancode == "pause" or button == "start" then
 		isPaused = not isPaused
 		timeScale = isPaused and 0 or 1
-	elseif scancode == "f3" or button == "back" then
+    elseif scancode == "f3" or button == "rightstick" then
         showDebug = not showDebug
+    elseif scancode == "`" or button == "back" then
+        showBuildMenu = not showBuildMenu
 	end
 end
 
