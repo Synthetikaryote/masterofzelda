@@ -1,32 +1,38 @@
---[[
 build = {
-	"Melee damage" = {
+	meleeDamage = {
+		name = "Melee damage",
 		description = "Points in this category affect your damage dealt from melee range. This affects all melee-range sources.",
 		children = {
-			"Double damage" = {
+			doubleDamage = {
 				enabled = false,
+				name = "Double damage",
 				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
 			},
-			"Half mana cost" = {
+			halfManaCost = {
 				enabled = false,
+				name = "Half mana cost",
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
 	},
-	"Ranged damage" = {
+	rangedDamage = {
+		name = "Ranged damage",
 		description = "Points in this category affect your damage dealt from  range. This affects all melee-range sources.",
 		children = {
-			"Double damage" = {
+			doubleDamage = {
 				enabled = false,
+				name = "Double damage",
 				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
 			},
-			"Half mana cost" = {
+			halfManaCost = {
 				enabled = false,
+				name = "Half mana cost",
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
 	}
 }
+--[[
 
 how to read this:
 "-" before something means it will cost points to add to your character (benefits)
