@@ -1,9 +1,11 @@
 Enemy = class(Character)
-function Enemy:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime, collisionDist, detectDist, collisionDamage)
+function Enemy:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime, collisionDist, detectDist, collisionDamage, pursueDist, startAttackDist)
     Character.init(self, id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
     self.collisionDist = collisionDist
     self.detectDist = detectDist
     self.collisionDamage = collisionDamage
+    self.pursueDist = pursueDist
+    self.startAttackDist = startAttackDist
     self.nextPlayerHitTime = 0
     self.nextPlayerHitQueued = false
     leftXOffset = math.max(leftXOffset, detectDist + biggestPivotWidth)
@@ -39,34 +41,39 @@ function Enemy:update()
                 local vy = dy * distInv
                 self.facingDir = math.atan2(vy, vx)
                 self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
-                local lastAniName = self.animationName
                 if player.isAlive and dist < self.collisionDist then
                     hits = hits + 1
                     player:gotHit(self, self.collisionDamage, 0.1, 30, 0)
                     self.nextPlayerHitQueued = false
-                elseif player.isAlive and dist < self.attackDist then
-                    if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
-                        self.animationName = "attack"
-                        self.nextPlayerHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
-                        self.nextPlayerHitQueued = true
-                    end
-                    if love.timer.getTime() * timeScale >= self.nextPlayerHitTime and self.nextPlayerHitQueued then
-                       self.nextPlayerHitQueued = false
-                        player:gotHit(self, self.attackDamage, 0.1, 90, 0)
-                    end
-                elseif player.isAlive and dist < self.detectDist then
-                    self.nextPlayerHitQueued = false
-                    self.animationName = "walk"
+                end
+                local newAniName = nil
+                if player.isAlive and dist < self.detectDist and dist >= self.pursueDist then
+                    newAniName = "walk"
                     local mult = self.moveSpeed * love.timer.getDelta() * timeScale
                     self:move(vector(self.p.x + vx * mult, self.p.y + vy * mult))
                 else
-                    self.nextPlayerHitQueued = false
-                    self.animationName = "walk"
-                    self.aniFrame = 0
-                    self.aniLastChange = love.timer.getTime() * timeScale
+                    if not player.isAlive or self.animationName ~= "attack" then
+                        newAniName = "walk"
+                        self.aniLastChange = love.timer.getTime() * timeScale
+                    end
                 end
-                if lastAniName ~= self.animationName then
+                if player.isAlive and dist < self.startAttackDist then
+                    newAniName = "attack"
+                    if self.animationName ~= "attack" or (self.aniFrame == 0 and self.nextPlayerHitQueued == false) then
+                        self.nextPlayerHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
+                        self.nextPlayerHitQueued = true
+                    end
+                end
+                if newAniName and self.animationName ~= newAniName then
+                    self.animationName = newAniName
                     self.aniFrame = 0
+                end
+                if self.animationName == "attack" then
+                    shouldBaseUpdate = true
+                    if love.timer.getTime() * timeScale >= self.nextPlayerHitTime and self.nextPlayerHitQueued and dist <= self.attackDist then
+                       self.nextPlayerHitQueued = false
+                        player:gotHit(self, self.attackDamage, 0.1, 90, 0)
+                    end
                 end
                 shouldBaseUpdate = true
             end

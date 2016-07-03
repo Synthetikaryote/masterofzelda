@@ -1,9 +1,4 @@
-how to read this:
-"-" before something means it will cost points to add to your character (benefits)
-"+" before something means it will give points to your character build (detriments)
-
-default attributes:
-
+--[[
 build = {
 	"Melee damage" = {
 		description = "Points in this category affect your damage dealt from melee range. This affects all melee-range sources.",
@@ -11,26 +6,34 @@ build = {
 			"Double damage" = {
 				enabled = false,
 				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
-			}
+			},
 			"Half mana cost" = {
 				enabled = false,
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
-	}
+	},
 	"Ranged damage" = {
 		description = "Points in this category affect your damage dealt from  range. This affects all melee-range sources.",
 		children = {
 			"Double damage" = {
 				enabled = false,
 				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
-			}
+			},
 			"Half mana cost" = {
 				enabled = false,
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
 	}
+}
+
+how to read this:
+"-" before something means it will cost points to add to your character (benefits)
+"+" before something means it will give points to your character build (detriments)
+
+default attributes:
+
 1 ranged damage (includes spells)
 	-double ranged damage
 	-half mana cost
@@ -98,3 +101,5 @@ things to consider later:
 pet(s)
 	must stay near player
 	high cost
+
+]]
