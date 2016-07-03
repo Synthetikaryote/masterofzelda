@@ -89,8 +89,9 @@ function Player:update()
                 local animation = self.sprite.animations[self.animationName]
                 visitCharsInRadius(vector(self.p.x + self.attackDist * 0.5 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.5, function(c)
                     if c ~= self then
+                        local wasAlive = c.isAlive
                         c:gotHit(self, self.attackDamage, 0.5, 90, 0.5)
-                        if c.hp <= 0 then
+                        if wasAlive and c.hp <= 0 then
                             self.killCount = self.killCount + 1
                         end
                     end

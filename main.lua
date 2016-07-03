@@ -87,7 +87,7 @@ function love.load()
         {310, 50}, {224, 315}, {136, 224}, {45, 136}
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
-    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
+    player = Player("player", playerSprite, 100,    200,       0.5,                 10000,        50,            0.1)
     player:move(vector(5088, 4000))
     characters[player.id] = player
 
@@ -217,6 +217,8 @@ function love.update()
     if showBuildMenu then
         buildMenu:update()
     end
+
+    collectgarbage("step")
 end
 
 function love.draw()
