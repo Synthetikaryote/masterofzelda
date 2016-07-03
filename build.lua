@@ -5,34 +5,28 @@ how to read this:
 ]]
 
 build = {
-	meleeDamage = {
-		name = "Melee damage",
+	["Melee damage"] = {
 		description = "Points in this category affect your damage dealt from melee range.",
 		children = {
-			doubleDamage = {
+			["Double damage"] = {
 				enabled = false,
-				name = "Double damage",
 				description = "This doubles your damage dealt from melee range. This affects all melee-range sources."
 			},
-			halfManaCost = {
+			["Half mana cost"] = {
 				enabled = false,
-				name = "Half mana cost",
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
 	},
-	rangedDamage = {
-		name = "Ranged damage",
+	["Ranged damage"] = {
 		description = "Points in this category affect damage dealt by your abilities which have greater range than melee.",
 		children = {
-			doubleDamage = {
+			["Double damage"] = {
 				enabled = false,
-				name = "Double damage",
 				description = "This doubles damage dealt by your abilities which have greater range than melee."
 			},
-			halfManaCost = {
+			["Half mana cost"] = {
 				enabled = false,
-				name = "Half mana cost",
 				description = "This reduces mana cost of abilities that affect only melee range by 50%."
 			}
 		}
