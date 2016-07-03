@@ -88,12 +88,18 @@ function Character:draw()
 end
 function Character:lateDraw()
     if self.hp < self.maxHp and self.isAlive then
-        love.graphics.setColor(0, 0, 0, 170)
-        love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60, 52, 4)
-        love.graphics.setColor(255, 64, 64, 170)
-        love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
+        self:drawHpBar()
     end
 end
+function Character:drawHpBar()
+    local p = self.hp / self.maxHp
+    local a = 170
+    love.graphics.setColor(0, 0, 0, a)
+    love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60, 52, 4)
+    love.graphics.setColor(math.min(1, 2 - p*2) * 255, math.min(1, p*2) * 255, 0, a)
+    love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
+end
+
 function Character:move(p, skipCollision, slideAlongWalls)
     local slideAlongWalls = slideAlongWalls == nil and true or false
     local mapX, mapY = map:convertScreenToWorld(p.x, p.y)
