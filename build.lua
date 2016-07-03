@@ -1,7 +1,8 @@
 --[[
 how to read this:
 "-" before something means it will cost points to add to your character (benefits)
-]]"+" before something means it will give points to your character build (detriments)
+"+" before something means it will give points to your character build (detriments)
+]]
 
 build = {
 	meleeDamage = {
