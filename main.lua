@@ -6,6 +6,7 @@ require "player"
 require "enemy"
 require "utils"
 require "buildMenu"
+require "binds"
 
 local sti = require "sti"
 
@@ -14,6 +15,7 @@ local sti = require "sti"
 timeScale = 1
 local isPaused = false
 font12 = love.graphics.newFont(12)
+font14 = love.graphics.newFont(14)
 font18 = love.graphics.newFont(18)
 font48 = love.graphics.newFont(48)
 font72 = love.graphics.newFont(72)
@@ -39,6 +41,7 @@ showAggro = false
 showAttackDist = false
 
 showBuildMenu = false
+showBinds = false
 
 local numVisited = 0
 function love.load()
@@ -114,6 +117,7 @@ function love.load()
     end
 
     buildMenu = BuildMenu()
+    binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 45, vector(0.5, 1), font14)
 end
 
 function visitCharsInRadius(p, r, f)
@@ -150,6 +154,8 @@ function checkInput(scancode, button)
         showDebug = not showDebug
     elseif scancode == "`" or button == "back" then
         showBuildMenu = not showBuildMenu
+    elseif scancode == "f4" then
+        showBinds = not showBinds
 	end
 end
 
@@ -217,6 +223,10 @@ function love.update()
     if showBuildMenu then
         buildMenu:update()
     end
+    if showBinds then
+        binds:update()
+    end
+
 
     collectgarbage("step")
 end
@@ -247,6 +257,9 @@ function love.draw()
 
     if showBuildMenu then
         buildMenu:draw()
+    end
+    if showBinds then
+        binds:draw()
     end
 
     -- print_r(obstacles, 0, 0, 4)
