@@ -60,3 +60,13 @@ function deepcopy(orig)
     end
     return copy
 end
+
+function drawScaleRotate(image, quad, x, y, scale, rotation, pivotX, pivotY)
+    love.graphics.push()
+    love.graphics.translate(x + pivotX, y + pivotY)
+    love.graphics.rotate(rotation)
+    love.graphics.translate(-pivotX, -pivotY)
+    love.graphics.scale(scale, scale)
+    love.graphics.draw(image, quad, 0, 0)
+    love.graphics.pop()
+end

@@ -56,8 +56,8 @@ function Player:update()
         local v = gamepad and vector(jx, jy) or vector(0, 0)
         local moving = false
         for k, data in pairs(dirData) do
-            local key, dv = data[1], data[2]
-            if keyboard[key] then
+            local ability, dv = data[1], data[2]
+            if abilities[ability] and abilities[ability].pressed then
                 v = v + dv
             end
         end
