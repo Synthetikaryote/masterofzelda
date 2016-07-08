@@ -123,14 +123,21 @@ function love.load()
     abilities["up"] = Ability("up", arrow)
     abilities["up"].rotation = -math.pi * 0.5
     binds.binds["e"].ability = abilities["up"]
+    binds.binds["up"].ability = abilities["up"]
     abilities["left"] = Ability("left", arrow)
     abilities["left"].rotation = -math.pi
     binds.binds["s"].ability = abilities["left"]
+    binds.binds["left"].ability = abilities["left"]
     abilities["down"] = Ability("left", arrow)
     abilities["down"].rotation = math.pi * 0.5
     binds.binds["d"].ability = abilities["down"]
+    binds.binds["down"].ability = abilities["down"]
     abilities["right"] = Ability("right", arrow)
     binds.binds["f"].ability = abilities["right"]
+    binds.binds["right"].ability = abilities["right"]
+    local spear = love.graphics.newImage("assets/ability icons/sword.png")
+    abilities["attack"] = Ability("attack", spear, function() player:attack() end)
+    binds.binds["space"].ability = abilities["attack"]
 end
 
 function visitCharsInRadius(p, r, f)

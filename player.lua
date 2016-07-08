@@ -120,17 +120,17 @@ function Player:gamepadpressed(gamepad, button)
     self:checkInput(nil, button)
 end
 function Player:checkInput(scancode, button)
-    if scancode == "space" or button == "a" then
-        if self.animationName ~= "polearm" then
-            self.animationName = "polearm"
-            self.aniFrame = 0
-            if self.nextHitQueued == false then
-                self.nextHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
-                self.nextHitQueued = true
-            end
-            local animation = self.sprite.animations[self.animationName]
-            local aniDuration = animation[2] * (1 / animation[3])
-            self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
+end
+function Player:attack()
+    if self.animationName ~= "polearm" then
+        self.animationName = "polearm"
+        self.aniFrame = 0
+        if self.nextHitQueued == false then
+            self.nextHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
+            self.nextHitQueued = true
         end
+        local animation = self.sprite.animations[self.animationName]
+        local aniDuration = animation[2] * (1 / animation[3])
+        self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
     end
 end

@@ -1,4 +1,5 @@
 abilities = {}
+
 Ability = class()
 function Ability:init(name, image, func)
     self.image = image
@@ -9,10 +10,13 @@ function Ability:init(name, image, func)
 end
 function Ability:draw(position, size)
     local scale = math.min(size.x / self.sizeX, size.y / self.sizeY)
-    drawScaleRotate(self.image, self.quad, position.x, position.y, scale, self.rotation or 0, size.x * 0.5, size.y * 0.5)
+    local pos = position + size * 0.5
+    local pivotX = math.floor(self.sizeX * 0.5 * scale + 0.5)
+    local pivotY = math.floor(self.sizeY * 0.5 * scale + 0.5)
+    drawScaleRotate(self.image, self.quad, math.floor(pos.x + 0.5), math.floor(pos.y + 0.5), scale, self.rotation or 0, pivotX, pivotY)
 end
 function Ability:activate()
-    if self.f then self.f() end
+    if self.func then self.func() end
 end
 
 Bind = class()
@@ -24,26 +28,31 @@ function Bind:init(scancode, position, size, text)
     self.lit = false
 end
 function Bind:update()
+    local wasLit = self.lit
     self.lit = keyboard[self.scancode]
     if self.ability then
-        if not self.ability.pressed and self.lit then
+        if not wasLit and self.lit then
             self.ability:activate()
         end
-        self.ability.pressed = self.lit
+        self.ability.pressed = self.ability.pressed or self.lit
     end
 end
 function Bind:draw(position, scale)
     local scaledSize = self.size * scale - vector(3, 3)
     local pos = position + self.position * scale
-
-    if self.ability then self.ability:draw(pos, scaledSize) end
     local r = 0.1 * scale
     local n = self.lit and 255 or 0
-    love.graphics.setColor(n * 0.1, n * 0.6, n)
-    love.graphics.rectangle("line", pos.x, pos.y, scaledSize.x, scaledSize.y, r, r, 4)
+    if self.ability then
+        love.graphics.setColor(128, 128, 128, 128)
+        love.graphics.rectangle("fill", pos.x, pos.y, scaledSize.x, scaledSize.y, r, r, 4)
+    end
+    love.graphics.setColor(255, 255, 255, 255)
+    if self.ability then self.ability:draw(pos, scaledSize) end
     local textPos = vector(math.floor(pos.x + 4), math.floor(pos.y + 4))
     love.graphics.setColor(255, 255, 255)
     love.graphics.print(self.text, textPos.x, textPos.y)
+    love.graphics.setColor(n * 0.2, n * 0.7, n)
+    love.graphics.rectangle("line", pos.x, pos.y, scaledSize.x, scaledSize.y, r, r, 4)
 end
 
 Binds = class()
@@ -75,7 +84,21 @@ function Binds:init(position, scale, pivot, font)
     self:addBind("rgui", vector(12.4, 5), vector(1.3, 1))
     self:addBind("rctrl", vector(13.7, 5), vector(1.3, 1))
 
-    self.size = vector(15, 6) * self.scale
+    self:addBind("printscreen", vector(15, 0), vector(1, 1), "prt\nscr")
+    self:addBind("scrolllock", vector(16, 0), vector(1, 1), "scroll\nlock")
+    self:addBind("pause", vector(17, 0), vector(1, 1), "pause\nbreak")
+    self:addBind("insert", vector(15, 1), vector(1, 1))
+    self:addBind("home", vector(16, 1), vector(1, 1))
+    self:addBind("pageup", vector(17, 1), vector(1, 1), "pgup")
+    self:addBind("delete", vector(15, 2), vector(1, 1))
+    self:addBind("end", vector(16, 2), vector(1, 1))
+    self:addBind("pagedown", vector(17, 2), vector(1, 1), "pgdn")
+    self:addBind("up", vector(16, 4), vector(1, 1))
+    self:addBind("left", vector(15, 5), vector(1, 1))
+    self:addBind("down", vector(16, 5), vector(1, 1))
+    self:addBind("right", vector(17, 5), vector(1, 1))
+
+    self.size = vector(18, 6) * self.scale
     self.offset = vector(-self.size.x * self.pivot.x, -self.size.y * self.pivot.y)
 end
 function Binds:addBind(scancode, position, size, text)
@@ -83,6 +106,9 @@ function Binds:addBind(scancode, position, size, text)
 end
 
 function Binds:update()
+    for k, v in pairs(abilities) do
+        v.pressed = false
+    end
     for k, v in pairs(self.binds) do
         v:update()
     end

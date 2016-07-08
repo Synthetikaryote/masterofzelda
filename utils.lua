@@ -63,7 +63,7 @@ end
 
 function drawScaleRotate(image, quad, x, y, scale, rotation, pivotX, pivotY)
     love.graphics.push()
-    love.graphics.translate(x + pivotX, y + pivotY)
+    love.graphics.translate(x, y)
     love.graphics.rotate(rotation)
     love.graphics.translate(-pivotX, -pivotY)
     love.graphics.scale(scale, scale)
