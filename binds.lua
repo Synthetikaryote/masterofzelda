@@ -48,10 +48,10 @@ function Bind:draw(position, scale)
     end
     love.graphics.setColor(255, 255, 255, 255)
     if self.ability then self.ability:draw(pos, scaledSize) end
-    local textPos = vector(math.floor(pos.x + 4), math.floor(pos.y + 4))
+    local textPos = vector(math.floor(pos.x + scale * 0.1), math.floor(pos.y + scale * 0.05))
     love.graphics.setColor(255, 255, 255)
     love.graphics.print(self.text, textPos.x, textPos.y)
-    love.graphics.setColor(n * 0.2, n * 0.7, n)
+    love.graphics.setColor(n * 0.1, n * 0.2, n * 0.6)
     love.graphics.rectangle("line", pos.x, pos.y, scaledSize.x, scaledSize.y, r, r, 4)
 end
 
@@ -86,7 +86,7 @@ function Binds:init(position, scale, pivot, font)
 
     self:addBind("printscreen", vector(15, 0), vector(1, 1), "prt\nscr")
     self:addBind("scrolllock", vector(16, 0), vector(1, 1), "scroll\nlock")
-    self:addBind("pause", vector(17, 0), vector(1, 1), "pause\nbreak")
+    self:addBind("pause", vector(17, 0), vector(1, 1), "pau\nbrk")
     self:addBind("insert", vector(15, 1), vector(1, 1))
     self:addBind("home", vector(16, 1), vector(1, 1))
     self:addBind("pageup", vector(17, 1), vector(1, 1), "pgup")
@@ -98,7 +98,18 @@ function Binds:init(position, scale, pivot, font)
     self:addBind("down", vector(16, 5), vector(1, 1))
     self:addBind("right", vector(17, 5), vector(1, 1))
 
-    self.size = vector(18, 6) * self.scale
+    self:addBind("numlock", vector(18, 1), vector(1, 1), "num\nlock")
+    self:addBind("kp/", vector(19, 1), vector(1, 1), "/")
+    self:addBind("kp*", vector(20, 1), vector(1, 1), "*")
+    self:addBind("kp-", vector(21, 1), vector(1, 1), "-")
+    s = "789456123" for i = 1, #s do self:addBind("kp"..s:sub(i, i), vector(18 + (i - 1) % 3, 2 + math.floor((i - 1) / 3)), vector(1, 1), s:sub(i, i)) end
+    self:addBind("kp+", vector(21, 2), vector(1, 2), "+")
+    self:addBind("kpenter", vector(21, 4), vector(1, 2), "en-\nter")
+    self:addBind("kp0", vector(18, 5), vector(2, 1), "0")
+    self:addBind("kp.", vector(20, 5), vector(1, 1), ".")
+
+
+    self.size = vector(22, 6) * self.scale
     self.offset = vector(-self.size.x * self.pivot.x, -self.size.y * self.pivot.y)
 end
 function Binds:addBind(scancode, position, size, text)

@@ -15,7 +15,6 @@ local sti = require "sti"
 timeScale = 1
 local isPaused = false
 font12 = love.graphics.newFont(12)
-font14 = love.graphics.newFont(14)
 font18 = love.graphics.newFont(18)
 font48 = love.graphics.newFont(48)
 font72 = love.graphics.newFont(72)
@@ -41,7 +40,7 @@ showAggro = false
 showAttackDist = false
 
 showBuildMenu = false
-showBinds = false
+showBinds = true
 
 local numVisited = 0
 function love.load()
@@ -117,7 +116,7 @@ function love.load()
     end
 
     buildMenu = BuildMenu()
-    binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 45, vector(0.5, 1), font14)
+    binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 30, vector(0.5, 1), love.graphics.newFont(10))
 
     local arrow = love.graphics.newImage("assets/ability icons/arrow512.png")
     abilities["up"] = Ability("up", arrow)
@@ -257,7 +256,8 @@ function love.draw()
 
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
-
+    
+    love.graphics.setFont(font12)
     love.graphics.print("fps "..love.timer.getFPS(), 10, 10)
     if showDebug then
         love.graphics.print("x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
@@ -274,11 +274,11 @@ function love.draw()
     love.graphics.print("Deaths: "..player.deaths, 40, 110)
     love.graphics.setFont(font12)
 
-    if showBuildMenu then
-        buildMenu:draw()
-    end
     if showBinds then
         binds:draw()
+    end
+    if showBuildMenu then
+        buildMenu:draw()
     end
 
     -- print_r(obstacles, 0, 0, 4)
