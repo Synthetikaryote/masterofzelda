@@ -118,6 +118,19 @@ function love.load()
 
     buildMenu = BuildMenu()
     binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 45, vector(0.5, 1), font14)
+
+    local arrow = love.graphics.newImage("assets/ability icons/arrow512.png")
+    abilities["up"] = Ability("up", arrow)
+    abilities["up"].rotation = -math.pi * 0.5
+    binds.binds["e"].ability = abilities["up"]
+    abilities["left"] = Ability("left", arrow)
+    abilities["left"].rotation = -math.pi
+    binds.binds["s"].ability = abilities["left"]
+    abilities["down"] = Ability("left", arrow)
+    abilities["down"].rotation = math.pi * 0.5
+    binds.binds["d"].ability = abilities["down"]
+    abilities["right"] = Ability("right", arrow)
+    binds.binds["f"].ability = abilities["right"]
 end
 
 function visitCharsInRadius(p, r, f)
@@ -204,6 +217,9 @@ function love.update()
         return
     end
 
+    binds:update()
+
+
     showAggro = keyboard["lctrl"] or keyboard["rctrl"]
     showAttackDist = keyboard["lalt"] or keyboard["ralt"]
 
@@ -223,10 +239,6 @@ function love.update()
     if showBuildMenu then
         buildMenu:update()
     end
-    if showBinds then
-        binds:update()
-    end
-
 
     collectgarbage("step")
 end
