@@ -72,11 +72,6 @@ function Player:update()
         local len = v:len()
         if len > 0 then
             moving = true
-            -- vector direction converted to an angle and mapped to the directions in the sprite
-            if self.animationName ~= "polearm" then
-                self.facingDir = math.atan2(v.y, v.x)
-                self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
-            end
             if len > 1 then v = v / len end
             local running = keyboard["lshift"] or keyboard["rshift"] or gamepad and gamepad:getGamepadAxis("triggerright") > 0.05
             v = v * self.moveSpeed * love.timer.getDelta() * timeScale * (running and 10 or 1)
@@ -105,6 +100,12 @@ function Player:update()
             self.animationName = "walk"
             self.aniFrame = 0
             self.aniLastChange = love.timer.getTime() * timeScale
+        end
+
+        -- vector direction converted to an angle and mapped to the directions in the sprite
+        if moving and self.animationName ~= "polearm" then
+            self.facingDir = math.atan2(v.y, v.x)
+            self.aniDir = self.sprite:getAniDirFromAngle(self.facingDir)
         end
     end
 
