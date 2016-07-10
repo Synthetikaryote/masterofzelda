@@ -424,7 +424,7 @@ return {
     },
     {
       type = "tilelayer",
-      name = "level 2 floor",
+      name = "level 2 floor 1",
       x = 0,
       y = 0,
       width = 240,
