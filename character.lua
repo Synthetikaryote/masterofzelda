@@ -68,9 +68,9 @@ function Character:earlyDraw()
 end
 function Character:draw()
     local animation = self.sprite.animations[self.animationName]
-    local leftX = mapP.x + self.p.x - animation[7]
+    local leftX = math.floor(mapP.x + self.p.x - animation[7] + 0.5)
     local rightX = leftX + animation[4]
-    local topY = mapP.y + self.p.y - animation[8]
+    local topY = math.floor(mapP.y + self.p.y - animation[8] + 0.5)
     local bottomY = topY + animation[5]
     if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
         if love.timer.getTime() * timeScale < self.damageEnds then

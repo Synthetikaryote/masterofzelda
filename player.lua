@@ -87,7 +87,7 @@ function Player:update()
             if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
                 self.nextHitQueued = false
                 local animation = self.sprite.animations[self.animationName]
-                visitCharsInRadius(vector(self.p.x + self.attackDist * 0.5 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.5, function(c)
+                visitCharsInRadius(vector(self.p.x + self.attackDist * 0.3 * math.cos(self.facingDir), self.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.7, function(c)
                     if c ~= self then
                         local wasAlive = c.isAlive
                         c:gotHit(self, self.attackDamage, 0.5, 90, 0.5)
@@ -122,7 +122,7 @@ end
 function Player:checkInput(scancode, button)
 end
 function Player:attack()
-    if self.animationName ~= "polearm" then
+    if self.isAlive and self.animationName ~= "polearm" then
         self.animationName = "polearm"
         self.aniFrame = 0
         if self.nextHitQueued == false then
