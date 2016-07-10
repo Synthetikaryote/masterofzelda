@@ -85,11 +85,13 @@ function Character:draw()
         end
         -- love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
     end
-end
-function Character:lateDraw()
+
     if self.hp < self.maxHp and self.isAlive then
         self:drawHpBar()
     end
+end
+function Character:lateDraw()
+
 end
 function Character:drawHpBar()
     local p = self.hp / self.maxHp
@@ -98,6 +100,7 @@ function Character:drawHpBar()
     love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60, 52, 4)
     love.graphics.setColor(math.min(1, 2 - p*2) * 255, math.min(1, p*2) * 255, 0, a)
     love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
+    love.graphics.setColor(255, 255, 255, 255)
 end
 
 function Character:move(p, skipCollision, slideAlongWalls)
