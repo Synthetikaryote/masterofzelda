@@ -61,11 +61,9 @@ function love.load()
     end
     -- draw callback for custom layer
     function spriteLayer:draw()
-        numVisited = 0
         local topLeft = vector(-mapP.x - leftXOffset, -mapP.y - topYOffset)
         local bottomRight = vector(-mapP.x + love.graphics.getWidth() + rightXOffset, -mapP.y + love.graphics.getHeight() + bottomYOffset)
         visitCharsInRect(topLeft, bottomRight, function(c)
-            numVisited = numVisited + 1
             c:earlyDraw()
         end)
          visitCharsInRect(topLeft, bottomRight, function(c)
@@ -105,7 +103,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 900
+    local numOrcs = 100000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          50,             20,             0.45,               10,             300,        10,                 30,         90)
@@ -236,8 +234,15 @@ function love.update()
         end
     end
     
-    for k, v in pairs(characters) do
-        v:update()
+    local charsToUpdate = {}
+    local topLeft = vector(-mapP.x - leftXOffset, -mapP.y - topYOffset)
+    local bottomRight = vector(-mapP.x + love.graphics.getWidth() + rightXOffset, -mapP.y + love.graphics.getHeight() + bottomYOffset)
+    visitCharsInRect(topLeft, bottomRight, function(c)
+        table.insert(charsToUpdate, c)
+    end)
+    numVisited = #charsToUpdate
+    for i, c in ipairs(charsToUpdate) do
+        c:update()
     end
 
     map:update(love.timer.getDelta() * timeScale)
