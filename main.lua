@@ -7,6 +7,7 @@ require "enemy"
 require "utils"
 require "buildMenu"
 require "binds"
+require "server"
 
 local sti = require "sti"
 
@@ -30,7 +31,7 @@ leftXOffset = 0
 rightXOffset = 0
 topYOffset = 0
 bottomYOffset = 0
-xyMapXWidth = love.graphics.getWidth() * 0.1
+xyMapXWidth = love.graphics.getWidth() * 0.01
 coroutines = {}
 log = ""
 obstacles = nil
@@ -105,7 +106,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 200000
+    local numOrcs = 20000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          50,             20,             0.45,               10,             300,        10,                 30,         90)
