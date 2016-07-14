@@ -43,6 +43,10 @@ showAttackDist = false
 showBuildMenu = false
 showBinds = true
 
+local lastWheelX = 0
+local lastWheelY = 0
+local wheelButtonDuration = 0.15
+
 local numVisited = 0
 function love.load()
     map = sti.new("assets/maps/savageland.lua", { })
@@ -98,7 +102,7 @@ function love.load()
         -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
         cast={0, 7, 20, 64, 64, 0, 32, 56},
         thrust={1, 8, 20, 64, 64, 256, 32, 56},
-        walk={2, 8, 18, 64, 64, 512, 32, 56},
+        walk={2, 8, 25, 64, 64, 512, 32, 56},
         slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         death={5, 6, 10, 64, 64, 1280, 32, 56},
@@ -106,7 +110,7 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 20000
+    local numOrcs = 300
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          50,             20,             0.45,               10,             300,        10,                 30,         90)
@@ -179,6 +183,34 @@ function checkInput(scancode, button)
 	end
 end
 
+function love.mousepressed(x, y, button, isTouch)
+    if button == 1 then keyboard["lmb"] = 1 end
+    if button == 2 then keyboard["rmb"] = 1 end
+    if button == 3 then keyboard["mmb"] = 1 end
+end
+
+function love.mousereleased(x, y, button, isTouch)
+    if button == 1 then keyboard["lmb"] = nil end
+    if button == 2 then keyboard["rmb"] = nil end
+    if button == 3 then keyboard["mmb"] = nil end
+end
+
+function love.wheelmoved(x, y)
+    if x < 0 then keyboard["wheelleft"] = 1 keyboard["wheelright"] = nil lastWheelX = love.timer.getTime() end
+    if x > 0 then keyboard["wheelright"] = 1 keyboard["wheelleft"] = nil lastWheelX = love.timer.getTime() end
+    if y < 0 then keyboard["wheeldown"] = 1 keyboard["wheelup"] = nil lastWheelY = love.timer.getTime() end
+    if y > 0 then keyboard["wheelup"] = 1 keyboard["wheeldown"] = nil lastWheelY = love.timer.getTime() end
+end
+
+function clearWheelButtonsX()
+    keyboard["wheelleft"] = nil
+    keyboard["wheelright"] = nil
+end
+function clearWheelButtonsY()
+    keyboard["wheelup"] = nil
+    keyboard["wheeldown"] = nil
+end
+
 function love.keypressed(key, scancode, isRepeat)
     keyboard[scancode] = 1
 
@@ -219,20 +251,21 @@ function love.gamepadreleased(gamepad, button)
     gamepads[id][button] = nil
 end
 
-function love.update()
+function love.update(dt)
     if isPaused then
         return
     end
 
     binds:update()
-
+    if love.timer.getTime() - lastWheelX > wheelButtonDuration then clearWheelButtonsX() end
+    if love.timer.getTime() - lastWheelY > wheelButtonDuration then clearWheelButtonsY() end
 
     showAggro = keyboard["lctrl"] or keyboard["rctrl"]
     showAttackDist = keyboard["lalt"] or keyboard["ralt"]
 
     for i = #coroutines, 1, -1 do
         local c = coroutines[i]
-        if coroutine.resume(c) == false then
+        if coroutine.resume(c, dt) == false then
             table.remove(coroutines, i)
         end
     end
@@ -271,7 +304,7 @@ function love.draw()
         love.graphics.print("x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
             "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
             "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
-            "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 130)
+            "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 230)
         print_r(gamepads, 10, 270)
 
         print_r(log, 10, 370)

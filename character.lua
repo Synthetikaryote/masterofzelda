@@ -27,6 +27,7 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.despawnQueued = false
     self.isAlive = true
     self.coroutines = {}
+    self.scale = 1
 end
 function Character:update()
     for i = #self.coroutines, 1, -1 do
@@ -68,10 +69,10 @@ function Character:earlyDraw()
 end
 function Character:draw()
     local animation = self.sprite.animations[self.animationName]
-    local leftX = math.floor(mapP.x + self.p.x - animation[7] + 0.5)
-    local rightX = leftX + animation[4]
-    local topY = math.floor(mapP.y + self.p.y - animation[8] + 0.5)
-    local bottomY = topY + animation[5]
+    local leftX = math.floor(mapP.x + self.p.x - animation[7] * self.scale + 0.5)
+    local rightX = leftX + animation[4] * self.scale
+    local topY = math.floor(mapP.y + self.p.y - animation[8] * self.scale + 0.5)
+    local bottomY = topY + animation[5] * self.scale
     if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
         if love.timer.getTime() * timeScale < self.damageEnds then
             self.damageColorThisFrame = math.floor(love.timer.getTime() * 35) % 3
@@ -79,7 +80,7 @@ function Character:draw()
             love.graphics.setColor((self.damageColorThisFrame == 0) and 255 or offVal, (self.damageColorThisFrame == 2) and 255 or offVal, (self.damageColorThisFrame == 1) and 255 or offVal, 255)
         end
         local quad = self.sprite.animationQuads[self.animationName][self.aniDir][self.aniFrame]
-        love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY)
+        love.graphics.draw(self.sprite.spritesheet, quad, leftX, topY, 0, self.scale, self.scale)
         if love.timer.getTime() * timeScale < self.damageEnds then
             love.graphics.setColor(255, 255, 255, 255)
         end
@@ -97,9 +98,9 @@ function Character:drawHpBar()
     local p = self.hp / self.maxHp
     local a = 170
     love.graphics.setColor(0, 0, 0, a)
-    love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60, 52, 4)
+    love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60 * self.scale, 52, 4)
     love.graphics.setColor(math.min(1, 2 - p*2) * 255, math.min(1, p*2) * 255, 0, a)
-    love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 + 1, 50 * self.hp / self.maxHp, 2)
+    love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 * self.scale + 1, 50 * self.hp / self.maxHp, 2)
     love.graphics.setColor(255, 255, 255, 255)
 end
 
