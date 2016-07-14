@@ -142,6 +142,8 @@ function love.load()
     local spear = love.graphics.newImage("assets/ability icons/sword.png")
     abilities["attack"] = Ability("attack", spear, function() player:attack() end)
     binds.binds["space"].ability = abilities["attack"]
+    binds.binds["lmb"].ability = abilities["attack"]
+    binds.binds["rmb"].ability = abilities["attack"]
 end
 
 function visitCharsInRadius(p, r, f)

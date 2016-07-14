@@ -108,16 +108,16 @@ function Binds:init(position, scale, pivot, font)
     self:addBind("kp0", vector(18, 5), vector(2, 1), "0")
     self:addBind("kp.", vector(20, 5), vector(1, 1), ".")
 
-    self:addBind("lmb", vector(23, 1), vector(1, 2), "lmb")
-    self:addBind("mmb", vector(24.5, 1.5), vector(1, 1), "mmb")
-    self:addBind("rmb", vector(26, 1), vector(1, 2), "rmb")
-    self:addBind("wheelup", vector(24.75, 1), vector(0.5, 0.5), "up")
-    self:addBind("wheelleft", vector(24, 1.75), vector(0.5, 0.5), "lf")
-    self:addBind("wheeldown", vector(24.75, 2.5), vector(0.5, 0.5), "dn")
-    self:addBind("wheelright", vector(25.5, 1.75), vector(0.5, 0.5), "rt")
+    self:addBind("lmb", vector(23, 0), vector(1, 2), "lmb")
+    self:addBind("mmb", vector(24.25, 0.25), vector(0.5, 1.5), "")
+    self:addBind("rmb", vector(25, 0), vector(1, 2), "rmb")
+    self:addBind("wheelup", vector(24, 0), vector(1, 0.25), "")
+    self:addBind("wheelleft", vector(24, 0.25), vector(0.25, 1.5), "")
+    self:addBind("wheeldown", vector(24, 1.75), vector(1, 0.25), "")
+    self:addBind("wheelright", vector(24.75, 0.25), vector(0.25, 1.5), "")
 
 
-    self.size = vector(27, 6) * self.scale
+    self.size = vector(26, 6) * self.scale
     self.offset = vector(-self.size.x * self.pivot.x, -self.size.y * self.pivot.y)
 end
 function Binds:addBind(scancode, position, size, text)
@@ -135,6 +135,8 @@ end
 function Binds:draw()
     love.graphics.setFont(self.font)
     local pos = self.position + self.offset
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("line", pos.x + 22.875 * self.scale, pos.y - 0.125 * self.scale, 3.25 * self.scale - 3, 6 * self.scale, 0.1 * self.scale)
     for k, v in pairs(self.binds) do
         v:draw(pos, self.scale, self.font)
     end
