@@ -115,7 +115,13 @@ function Binds:init(position, scale, pivot, font)
     self:addBind("wheelleft", vector(24, 0.25), vector(0.25, 1.5), "")
     self:addBind("wheeldown", vector(24, 1.75), vector(1, 0.25), "")
     self:addBind("wheelright", vector(24.75, 0.25), vector(0.25, 1.5), "")
-
+    self:addBind("wheelright", vector(24.75, 0.25), vector(0.25, 1.5), "")
+    self:addBind("mb4", vector(23, 2), vector(1, 1))
+    self:addBind("mb5", vector(24, 2), vector(1, 1))
+    self:addBind("mb6", vector(25, 2), vector(1, 1))
+    self:addBind("mb7", vector(23, 3), vector(1, 1))
+    self:addBind("mb8", vector(24, 3), vector(1, 1))
+    self:addBind("mb9", vector(25, 3), vector(1, 1))
 
     self.size = vector(26, 6) * self.scale
     self.offset = vector(-self.size.x * self.pivot.x, -self.size.y * self.pivot.y)

@@ -189,6 +189,9 @@ function love.mousepressed(x, y, button, isTouch)
     if button == 1 then keyboard["lmb"] = 1 end
     if button == 2 then keyboard["rmb"] = 1 end
     if button == 3 then keyboard["mmb"] = 1 end
+    for i = 4, 9 do
+        if button == i then keyboard["mb"..i] = 1 end
+    end
 end
 
 function love.mousereleased(x, y, button, isTouch)
