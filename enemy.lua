@@ -12,10 +12,11 @@ function Enemy:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, at
     rightXOffset = math.max(rightXOffset, detectDist)
     topYOffset = math.max(topYOffset, detectDist + biggestPivotHeight)
     bottomYOffset = math.max(bottomYOffset, detectDist)
+    self.state.type = "Enemy"
 end
 hits = 0
 function Enemy:update()
-    local shouldBaseUpdate = #self.coroutines > 0
+    local shouldBaseUpdate = false
     if self.hp <= 0 then
         if self.animationName ~= "death" then
             self.animationName = "death"
@@ -81,6 +82,8 @@ function Enemy:update()
     end
     if shouldBaseUpdate then
         Character.update(self)
+    elseif #self.coroutines > 0 then
+        Character.updateCoroutines(self)
     end
 end
 function Enemy:earlyDraw()

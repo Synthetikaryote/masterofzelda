@@ -33,7 +33,7 @@ topYOffset = 0
 bottomYOffset = 0
 xyMapXWidth = love.graphics.getWidth() * 0.01
 coroutines = {}
-log = ""
+logString = ""
 obstacles = nil
 showDebug = false
 
@@ -46,6 +46,7 @@ showBinds = true
 local lastWheelX = 0
 local lastWheelY = 0
 local wheelButtonDuration = 0.15
+local server
 
 local numVisited = 0
 function love.load()
@@ -54,8 +55,8 @@ function love.load()
 
     for k, layer in pairs(map.layers) do
         function layer:update(dt)
-            mapP.x = -player.p.x + love.graphics.getWidth() * 0.5
-            mapP.y = -player.p.y + love.graphics.getHeight() * 0.5
+            mapP.x = math.floor(-player.p.x + love.graphics.getWidth() * 0.5 + 0.5)
+            mapP.y = math.floor(-player.p.y + love.graphics.getHeight() * 0.5 + 0.5)
             self.x = mapP.x
             self.y = mapP.y
         end
@@ -102,18 +103,19 @@ function love.load()
         -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
         cast={0, 7, 20, 64, 64, 0, 32, 56},
         thrust={1, 8, 20, 64, 64, 256, 32, 56},
-        walk={2, 8, 25, 64, 64, 512, 32, 56},
+        walk={2, 8, 10, 64, 64, 512, 32, 56},
         slashEmpty={3, 6, 20, 64, 64, 768, 32, 56},
         shoot={4, 13, 20, 64, 64, 1024, 32, 56},
         death={5, 6, 10, 64, 64, 1280, 32, 56},
-        attack={6, 6, 10, 192, 192, 1345, 96, 119}
+        attack={6, 6, 5, 192, 192, 1345, 96, 119}
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 300
+    local numOrcs = 900
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
-        local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          50,             20,             0.45,               10,             300,        10,                 30,         90)
+        local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          60,            20,             0.90,               10,             300,        10,                 30,         110)
+        orc.scale = 1
         repeat
             orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
         until (orc.p - player.p):lenSq() > 400 * 400
@@ -144,6 +146,8 @@ function love.load()
     binds.binds["space"].ability = abilities["attack"]
     binds.binds["lmb"].ability = abilities["attack"]
     binds.binds["rmb"].ability = abilities["attack"]
+
+    server = Server(player)
 end
 
 function visitCharsInRadius(p, r, f)
@@ -189,7 +193,7 @@ function love.mousepressed(x, y, button, isTouch)
     if button == 1 then keyboard["lmb"] = 1 end
     if button == 2 then keyboard["rmb"] = 1 end
     if button == 3 then keyboard["mmb"] = 1 end
-    for i = 4, 9 do
+    for i = 4, 12 do
         if button == i then keyboard["mb"..i] = 1 end
     end
 end
@@ -292,6 +296,8 @@ function love.update(dt)
         buildMenu:update()
     end
 
+    server:update()
+
     collectgarbage("step")
 end
 
@@ -310,10 +316,10 @@ function love.draw()
             "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
             "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
             "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 230)
-        print_r(gamepads, 10, 270)
-
-        print_r(log, 10, 370)
+        print_r(gamepads, 10, 320)
     end
+
+    love.graphics.print(logString, 10, 370)
 
     love.graphics.setFont(font48)
     love.graphics.print("Kills: "..player.killCount, 40, 40)
@@ -383,4 +389,8 @@ function love.run()
             love.graphics.present()
         end
     end
+end
+
+function log(s)
+    logString = logString..s.."\n"
 end

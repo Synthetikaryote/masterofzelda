@@ -24,6 +24,7 @@ function Player:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, a
     self.deaths = 0
     self.respawnTime = 0
     self.respawnQueued = false
+    self.state.type = "Player"
 end
 function Player:update()
     if self.hp <= 0 then

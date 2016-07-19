@@ -1,5 +1,6 @@
-Character = class()
+Character = class(NetworkEntity)
 function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist, attackDamage, attackDamageTime)
+    NetworkEntity.init(self)
     self.id = id
     self.sprite = sprite
     self.aniDir = 4
@@ -28,14 +29,10 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.isAlive = true
     self.coroutines = {}
     self.scale = 1
+    self.state.type = "Character"
 end
 function Character:update()
-    for i = #self.coroutines, 1, -1 do
-        local c = self.coroutines[i]
-        if coroutine.resume(c) == false then
-            table.remove(self.coroutines, i)
-        end
-    end
+    self:updateCoroutines()
     if self.despawnQueued and love.timer.getTime() * timeScale >= self.despawnTime and #self.coroutines == 0 then
         if xyMap[self.xyMapP.y] ~= nil then
             if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
@@ -51,8 +48,13 @@ function Character:update()
         self.aniFrame = self.aniLooping and ((self.aniFrame + 1) % animation[2]) or math.min(self.aniFrame + 1, animation[2] - 1)
         self.aniLastChange = love.timer.getTime() * timeScale
     end
-    for k, v in pairs(self.coroutines) do
-
+end
+function Character:updateCoroutines()
+    for i = #self.coroutines, 1, -1 do
+        local c = self.coroutines[i]
+        if coroutine.resume(c) == false then
+            table.remove(self.coroutines, i)
+        end
     end
 end
 function Character:earlyDraw()
@@ -98,9 +100,9 @@ function Character:drawHpBar()
     local p = self.hp / self.maxHp
     local a = 170
     love.graphics.setColor(0, 0, 0, a)
-    love.graphics.rectangle("fill", mapP.x + self.p.x - 25, mapP.y + self.p.y - 60 * self.scale, 52, 4)
+    love.graphics.rectangle("fill", math.floor(mapP.x + self.p.x - 25 * self.scale + 0.5), math.floor(mapP.y + self.p.y - 60 * self.scale + 0.5), 52 * self.scale, 4 * self.scale)
     love.graphics.setColor(math.min(1, 2 - p*2) * 255, math.min(1, p*2) * 255, 0, a)
-    love.graphics.rectangle("fill", mapP.x + self.p.x - 25 + 1, mapP.y + self.p.y - 60 * self.scale + 1, 50 * self.hp / self.maxHp, 2)
+    love.graphics.rectangle("fill", math.floor(mapP.x + self.p.x - 25 * self.scale + 1 + 0.5), math.floor(mapP.y + self.p.y - 60 * self.scale + 1 + 0.5), 52 * self.hp / self.maxHp * self.scale - 2, 4 * self.scale - 2)
     love.graphics.setColor(255, 255, 255, 255)
 end
 
@@ -167,6 +169,10 @@ function Character:move(p, skipCollision, slideAlongWalls)
         end
         xyMap[y][x][self.id] = self
     end
+
+    -- network state
+    self.state.x = self.p.x
+    self.state.y = self.p.y
 end
 function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, stunDuration)
     if love.timer.getTime() * timeScale > self.nextDamageable then

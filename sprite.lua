@@ -4,6 +4,7 @@ biggestPivotHeight = 0
 Sprite = class()
 function Sprite:init(filename, animations, aniDirs)
     self.spritesheet = love.graphics.newImage(filename)
+    self.spritesheet:setFilter("nearest", "nearest")
     self.animations = animations
     self.aniDirs = aniDirs
     self.animationQuads = {}
