@@ -3,6 +3,7 @@ require "vector"
 require "sprite"
 require "character"
 require "player"
+require "localPlayer"
 require "enemy"
 require "utils"
 require "buildMenu"
@@ -82,6 +83,8 @@ function love.load()
         -- end)
     end
 
+    binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 30, vector(0.5, 1), love.graphics.newFont(10))
+
     local playerSprite = Sprite("assets/character.png", {
         -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
         cast={0, 7, 20, 64, 64, 0, 32, 56},
@@ -95,7 +98,7 @@ function love.load()
         {310, 50}, {224, 315}, {136, 224}, {45, 136}
     })
     -- function Player:init(id, sprite,     hp,     moveSpeed, invincibilityTime,   attackDist, attackDamage,   attackDamageTime)
-    player = Player("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
+    player = LocalPlayer("player", playerSprite, 100,    200,       0.5,                 100,        50,            0.1)
     player:move(vector(5088, 4000))
     characters[player.id] = player
 
@@ -123,29 +126,6 @@ function love.load()
     end
 
     buildMenu = BuildMenu()
-    binds = Binds(vector(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 1), 30, vector(0.5, 1), love.graphics.newFont(10))
-
-    local arrow = love.graphics.newImage("assets/ability icons/arrow512.png")
-    abilities["up"] = Ability("up", arrow)
-    abilities["up"].rotation = -math.pi * 0.5
-    binds.binds["e"].ability = abilities["up"]
-    binds.binds["up"].ability = abilities["up"]
-    abilities["left"] = Ability("left", arrow)
-    abilities["left"].rotation = -math.pi
-    binds.binds["s"].ability = abilities["left"]
-    binds.binds["left"].ability = abilities["left"]
-    abilities["down"] = Ability("left", arrow)
-    abilities["down"].rotation = math.pi * 0.5
-    binds.binds["d"].ability = abilities["down"]
-    binds.binds["down"].ability = abilities["down"]
-    abilities["right"] = Ability("right", arrow)
-    binds.binds["f"].ability = abilities["right"]
-    binds.binds["right"].ability = abilities["right"]
-    local spear = love.graphics.newImage("assets/ability icons/sword.png")
-    abilities["attack"] = Ability("attack", spear, function() player:attack() end)
-    binds.binds["space"].ability = abilities["attack"]
-    binds.binds["lmb"].ability = abilities["attack"]
-    binds.binds["rmb"].ability = abilities["attack"]
 
     server = Server(player)
 end
@@ -228,8 +208,6 @@ function love.keypressed(key, scancode, isRepeat)
     if isPaused then
         return
     end
-
-    player:keypressed(key, scancode, isRepeat)
 end
 
 function love.keyreleased(key, scancode, isRepeat)
@@ -248,8 +226,6 @@ function love.gamepadpressed(gamepad, button)
     if isPaused then
     	return
     end
-
-    player:gamepadpressed(gamepad, button)
 end
 
 function love.gamepadreleased(gamepad, button)
