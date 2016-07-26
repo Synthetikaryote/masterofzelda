@@ -132,7 +132,7 @@ end
 
 function visitCharsInRadius(p, r, f)
     visitCharsInRect(vector(p.x - r, p.y - r), vector(p.x + r, p.y + r), function(c)
-        if (c.p - p):lenSq() < r * r then
+        if (c.state.p - p):lenSq() < r * r then
             f(c)
         end
     end)

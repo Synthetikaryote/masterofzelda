@@ -176,7 +176,7 @@ function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, s
         self.damageEnds = (love.timer.getTime() + damageEffectDuration) * timeScale
         self.nextDamageable = (love.timer.getTime() + self.invincibilityTime) * timeScale
         self.stunEndTime = (love.timer.getTime() + stunDuration) * timeScale
-        local dp = source.p - self.state.p
+        local dp = source.state.p - self.state.p
         local n = dp:normalized()
         table.insert(self.coroutines, coroutine.create(function()
             local knockbackSpeed = 500
