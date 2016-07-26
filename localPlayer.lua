@@ -42,33 +42,33 @@ function LocalPlayer:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDi
     binds.binds["rmb"].ability = abilities["attack"]
 end
 function LocalPlayer:update()
-    self.moving = false
+    self.state.moving = false
     if self.isAlive then
         local gamepad = love.joystick.getJoysticks()[1]
         local jx, jy = gamepad and gamepad:getGamepadAxis("leftx") or 0, gamepad and gamepad:getGamepadAxis("lefty") or 0
         if math.abs(jx) < 0.06 then jx = 0 else jx = (jx - 0.06) / (1 - 0.06) end
         if math.abs(jy) < 0.06 then jy = 0 else jy = (jy - 0.06) / (1 - 0.06) end
-        self.v = gamepad and vector(jx, jy) or vector(0, 0)
+        self.state.v = gamepad and vector(jx, jy) or vector(0, 0)
         for k, data in pairs(dirData) do
             local ability, dv = data[1], data[2]
             if abilities[ability] and abilities[ability].pressed then
-                self.v = self.v + dv
+                self.state.v = self.state.v + dv
             end
         end
         for k, data in pairs(gamepadDirData) do
             local button, dv = data[1], data[2]
             if gamepads[1] then
                 if gamepads[1][button] then
-                    self.v = self.v + dv
+                    self.state.v = self.state.v + dv
                 end
             end
         end
-        local len = self.v:len()
+        local len = self.state.v:len()
         if len > 0 then
-            self.moving = true
-            if len > 1 then self.v = self.v / len end
+            self.state.moving = true
+            if len > 1 then self.state.v = self.state.v / len end
             local running = keyboard["lshift"] or keyboard["rshift"] or gamepad and gamepad:getGamepadAxis("triggerright") > 0.05
-            self.v = self.v * self.moveSpeed * love.timer.getDelta() * timeScale * (running and 10 or 1)
+            self.state.v = self.state.v * self.moveSpeed * love.timer.getDelta() * timeScale * (running and 10 or 1)
         end
     end
 

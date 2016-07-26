@@ -56,8 +56,8 @@ function love.load()
 
     for k, layer in pairs(map.layers) do
         function layer:update(dt)
-            mapP.x = math.floor(-player.p.x + love.graphics.getWidth() * 0.5 + 0.5)
-            mapP.y = math.floor(-player.p.y + love.graphics.getHeight() * 0.5 + 0.5)
+            mapP.x = math.floor(-player.state.p.x + love.graphics.getWidth() * 0.5 + 0.5)
+            mapP.y = math.floor(-player.state.p.y + love.graphics.getHeight() * 0.5 + 0.5)
             self.x = mapP.x
             self.y = mapP.y
         end
@@ -114,14 +114,14 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 900
+    local numOrcs = 0
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          60,            20,             0.90,               10,             300,        10,                 30,         110)
         orc.scale = 1
         repeat
             orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
-        until (orc.p - player.p):lenSq() > 400 * 400
+        until (orc.p - player.state.p):lenSq() > 400 * 400
         characters[orc.id] = orc
     end
 
@@ -288,7 +288,7 @@ function love.draw()
     love.graphics.setFont(font12)
     love.graphics.print("fps "..love.timer.getFPS(), 10, 10)
     if showDebug then
-        love.graphics.print("x, y "..player.p.x..", "..player.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
+        love.graphics.print("x, y "..player.state.p.x..", "..player.state.p.y..", aniDir "..player.aniDir.." frame "..player.aniFrame..(joystick and "\njoystick "..joystick:getAxis(1)..", "..joystick:getAxis(2) or "")..
             "\nnumVisited "..numVisited.." nextDamageable "..player.nextDamageable.." hits "..hits.." color "..player.damageColorThisFrame..
             "\ntime "..love.timer.getTime() * timeScale.." nextHitTime "..player.nextHitTime..
             "\nmapP "..player.mapP.x..", "..player.mapP.y, 10, 230)

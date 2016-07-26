@@ -1,9 +1,16 @@
 biggestPivotWidth = 0
 biggestPivotHeight = 0
 
+local images = {}
+
 Sprite = class()
 function Sprite:init(filename, animations, aniDirs)
-    self.spritesheet = love.graphics.newImage(filename)
+    local image = images[filename]
+    if not image then
+        image = love.graphics.newImage(filename)
+        images[filename] = image
+    end
+    self.spritesheet = image
     self.spritesheet:setFilter("nearest", "nearest")
     self.animations = animations
     self.aniDirs = aniDirs

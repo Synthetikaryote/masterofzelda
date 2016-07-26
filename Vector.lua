@@ -29,3 +29,12 @@ end
 function vector:normalized()
     return self / self:len()
 end
+
+-- local mt = getmetatable(vector)
+-- mt._serialize = function()
+--     return self.x, self.y
+-- end
+-- mt._deserialize = function(x, y)
+--     return vector(x, y)
+-- end
+-- setmetatable(vector, mt)

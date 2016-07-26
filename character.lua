@@ -9,10 +9,10 @@ function Character:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDist
     self.aniLooping = true
     self.animationName = select(1, next(self.sprite.animations))
     self.maxHp = hp
-    self.hp = hp
+    self.state.hp = hp
     self.moveSpeed = moveSpeed
     self.facingDir = 0
-    self.p = vector(0, 0)
+    self.state.p = vector(0, 0)
     self.mapP = vector(0, 0)
     self.attackEnds = 0
     self.damageEnds = 0
@@ -60,8 +60,8 @@ end
 function Character:earlyDraw()
     if showAttackDist then
         local animation = self.sprite.animations[self.animationName]
-        local x = mapP.x + self.p.x
-        local y = mapP.y + self.p.y
+        local x = mapP.x + self.state.p.x
+        local y = mapP.y + self.state.p.y
         love.graphics.setColor(0, 0, 255, 255)
         love.graphics.circle("line", x, y, self.attackDist, 40)
         love.graphics.setColor(0, 0, 255, 50)
@@ -71,9 +71,9 @@ function Character:earlyDraw()
 end
 function Character:draw()
     local animation = self.sprite.animations[self.animationName]
-    local leftX = math.floor(mapP.x + self.p.x - animation[7] * self.scale + 0.5)
+    local leftX = math.floor(mapP.x + self.state.p.x - animation[7] * self.scale + 0.5)
     local rightX = leftX + animation[4] * self.scale
-    local topY = math.floor(mapP.y + self.p.y - animation[8] * self.scale + 0.5)
+    local topY = math.floor(mapP.y + self.state.p.y - animation[8] * self.scale + 0.5)
     local bottomY = topY + animation[5] * self.scale
     if rightX >= 0 and leftX < love.graphics.getWidth() and bottomY >= 0 and topY < love.graphics.getHeight() then
         if love.timer.getTime() * timeScale < self.damageEnds then
@@ -86,10 +86,10 @@ function Character:draw()
         if love.timer.getTime() * timeScale < self.damageEnds then
             love.graphics.setColor(255, 255, 255, 255)
         end
-        -- love.graphics.circle("fill", mapP.x + self.p.x, mapP.y + self.p.y, 3, 5)
+        -- love.graphics.circle("fill", mapP.x + self.state.p.x, mapP.y + self.state.p.y, 3, 5)
     end
 
-    if self.hp < self.maxHp and self.isAlive then
+    if self.state.hp < self.maxHp and self.isAlive then
         self:drawHpBar()
     end
 end
@@ -97,12 +97,12 @@ function Character:lateDraw()
 
 end
 function Character:drawHpBar()
-    local p = self.hp / self.maxHp
+    local p = self.state.hp / self.maxHp
     local a = 170
     love.graphics.setColor(0, 0, 0, a)
-    love.graphics.rectangle("fill", math.floor(mapP.x + self.p.x - 25 * self.scale + 0.5), math.floor(mapP.y + self.p.y - 60 * self.scale + 0.5), 52 * self.scale, 4 * self.scale)
+    love.graphics.rectangle("fill", math.floor(mapP.x + self.state.p.x - 25 * self.scale + 0.5), math.floor(mapP.y + self.state.p.y - 60 * self.scale + 0.5), 52 * self.scale, 4 * self.scale)
     love.graphics.setColor(math.min(1, 2 - p*2) * 255, math.min(1, p*2) * 255, 0, a)
-    love.graphics.rectangle("fill", math.floor(mapP.x + self.p.x - 25 * self.scale + 1 + 0.5), math.floor(mapP.y + self.p.y - 60 * self.scale + 1 + 0.5), 52 * self.hp / self.maxHp * self.scale - 2, 4 * self.scale - 2)
+    love.graphics.rectangle("fill", math.floor(mapP.x + self.state.p.x - 25 * self.scale + 1 + 0.5), math.floor(mapP.y + self.state.p.y - 60 * self.scale + 1 + 0.5), 52 * self.state.hp / self.maxHp * self.scale - 2, 4 * self.scale - 2)
     love.graphics.setColor(255, 255, 255, 255)
 end
 
@@ -113,11 +113,11 @@ function Character:move(p, skipCollision, slideAlongWalls)
 
     if not skipCollision then
         -- list the tiles this will move through
-        local dp = p - self.p
+        local dp = p - self.state.p
         local dist = dp:len()
         local n = dp / dist
         local d = 0
-        local q = self.p
+        local q = self.state.p
         local m = vector(0, 0)
         local tW, tH = 32, 32
         local tilesHit = {}
@@ -143,14 +143,14 @@ function Character:move(p, skipCollision, slideAlongWalls)
                     -- then move them along that wall the rest of their intended travel distance
                     self:move(cp, true, false)
                     if slideAlongWalls then
-                        self:move(self.p + newDir * d, false, false)
+                        self:move(self.state.p + newDir * d, false, false)
                     end
                     return
                 end
             end
         end
     end
-    self.p = p
+    self.state.p = p
     self.mapP = vector(mapX, mapY)
     local x = math.floor(p.x / xyMapXWidth)
     local y = math.floor(p.y)
@@ -169,18 +169,14 @@ function Character:move(p, skipCollision, slideAlongWalls)
         end
         xyMap[y][x][self.id] = self
     end
-
-    -- network state
-    self.state.x = self.p.x
-    self.state.y = self.p.y
 end
 function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, stunDuration)
     if love.timer.getTime() * timeScale > self.nextDamageable then
-        self.hp = math.max(0, self.hp - damage)
+        self.state.hp = math.max(0, self.state.hp - damage)
         self.damageEnds = (love.timer.getTime() + damageEffectDuration) * timeScale
         self.nextDamageable = (love.timer.getTime() + self.invincibilityTime) * timeScale
         self.stunEndTime = (love.timer.getTime() + stunDuration) * timeScale
-        local dp = source.p - self.p
+        local dp = source.p - self.state.p
         local n = dp:normalized()
         table.insert(self.coroutines, coroutine.create(function()
             local knockbackSpeed = 500
@@ -188,7 +184,7 @@ function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, s
                 local dist = math.min(knockbackDist, love.timer.getDelta() * timeScale * knockbackSpeed)
                 knockbackDist = knockbackDist - dist
                 if self ~= nil then
-                    self:move(self.p + -n * dist)
+                    self:move(self.state.p + -n * dist)
                 end
                 coroutine.yield()
             end

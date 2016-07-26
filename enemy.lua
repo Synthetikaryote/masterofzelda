@@ -17,7 +17,7 @@ end
 hits = 0
 function Enemy:update()
     local shouldBaseUpdate = false
-    if self.hp <= 0 then
+    if self.state.hp <= 0 then
         if self.animationName ~= "death" then
             self.animationName = "death"
             self.aniDir = 1
