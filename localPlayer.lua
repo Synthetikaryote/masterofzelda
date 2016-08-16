@@ -92,6 +92,14 @@ function LocalPlayer:update()
     end
 
     Player.update(self)
+
+    if self.nid then
+        local serialized = server:serialize("updateEntity", {nid=self.nid, state=self.state})
+        if serialized ~= self.lastUpdateEntity then
+            server:send(serialized)
+            self.lastUpdateEntity = serialized
+        end
+    end
 end
 function LocalPlayer:draw()
     Player.draw(self)

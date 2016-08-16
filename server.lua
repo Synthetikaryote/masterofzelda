@@ -21,14 +21,15 @@ function Server:init(player)
     self.networkEntities = {}
     self.playerEntity = player
 
+    self.heartbeatFrequency = 1
+    self.nextHeartbeat = 0 --right away
+
     self.udp:send(binser.serialize("requestId", {state=self.playerEntity.state}))
 end
 function Server:update()
-    -- send update
-    if self.playerEntity.nid then
-        local request = {nid=self.playerEntity.nid, state=self.playerEntity.state}
-        self.udp:send(binser.serialize("updateEntity", request))
-        print_r(request, 300, 320)
+    if self.playerEntity.nid and love.timer.getTime() >= self.nextHeartbeat then
+        self.udp:send(binser.serialize("heartbeat"))
+        self.nextHeartbeat = love.timer.getTime() + self.heartbeatFrequency
     end
 
     repeat
@@ -103,10 +104,6 @@ function Server:update()
         end
     until not bindata
 end
-function Server:attackLocation(p, r, damage, damageEffectDuration, knockbackDist, stunDuration)
-    log("attackLocation")
-    self.udp:send(binser.serialize("attackLocation", {p=p, r=r, damage=damage, damageEffectDuration=damageEffectDuration, knockbackDist=knockbackDist, stunDuration=stunDuration}))
-end
 
 function createPlayer(nid, state)
     local playerSprite = Sprite("assets/character.png", {
@@ -129,4 +126,21 @@ function createPlayer(nid, state)
     player:move(player.state.p)
     characters[player.id] = player
     return player
+end
+
+function Server:attackLocation(p, r, damage, damageEffectDuration, knockbackDist, stunDuration)
+    log("attackLocation")
+    self.udp:send(binser.serialize("attackLocation", {p=p, r=r, damage=damage, damageEffectDuration=damageEffectDuration, knockbackDist=knockbackDist, stunDuration=stunDuration}))
+end
+
+function Server:updateEntity(nid, state)
+    self.udp:send(binser.serialize("updateEntity", {nid=nid, state=state}))
+end
+
+function Server:serialize(cmd, data)
+    return binser.serialize(cmd, data)
+end
+
+function Server:send(preSerialized)
+    self.udp:send(preSerialized)
 end
