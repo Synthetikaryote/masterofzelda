@@ -103,7 +103,7 @@ function love.load()
     characters[player.id] = player
 
     local orcSprite = Sprite("assets/orc.png", {
-        -- animation name = {y value, frames in animation, frames per second, xSize, ySize}
+        -- animation name = {y value, frames in animation, frames per second, width, height, y offset, x center, y center}
         cast={0, 7, 20, 64, 64, 0, 32, 56},
         thrust={1, 8, 20, 64, 64, 256, 32, 56},
         walk={2, 8, 10, 64, 64, 512, 32, 56},
