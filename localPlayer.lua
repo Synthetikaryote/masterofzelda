@@ -36,7 +36,7 @@ function LocalPlayer:init(id, sprite, hp, moveSpeed, invincibilityTime, attackDi
     binds.binds["f"].ability = abilities["right"]
     binds.binds["right"].ability = abilities["right"]
     local spear = love.graphics.newImage("assets/ability icons/sword.png")
-    abilities["attack"] = Ability("attack", spear, function() player:attack() end)
+    abilities["attack"] = Ability("attack", spear, function() self:attack() end)
     binds.binds["space"].ability = abilities["attack"]
     binds.binds["lmb"].ability = abilities["attack"]
     binds.binds["rmb"].ability = abilities["attack"]
@@ -70,6 +70,25 @@ function LocalPlayer:update()
             local running = keyboard["lshift"] or keyboard["rshift"] or gamepad and gamepad:getGamepadAxis("triggerright") > 0.05
             self.state.v = self.state.v * self.moveSpeed * love.timer.getDelta() * timeScale * (running and 10 or 1)
         end
+        if love.timer.getTime() * timeScale <= self.attackEnds then
+            if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
+                self.nextHitQueued = false
+                local animation = self.sprite.animations[self.animationName]
+                local p = vector(self.state.p.x + self.attackDist * 0.3 * math.cos(self.facingDir), self.state.p.y + self.attackDist * 0.5 * math.sin(self.facingDir))
+                server:attackLocation(p, self.attackDist * 0.7, self.attackDamage, 0.5, 90, 0.5)
+                --[[
+                visitCharsInRadius(p, self.attackDist * 0.7, function(c)
+                    if c ~= self then
+                        local wasAlive = c.isAlive
+                        c:gotHit(self, , )
+                        if wasAlive and c.state.hp <= 0 then
+                            self.killCount = self.killCount + 1
+                        end
+                    end
+                end)
+                ]]
+            end
+        end
     end
 
     Player.update(self)
@@ -78,5 +97,15 @@ function LocalPlayer:draw()
     Player.draw(self)
 end
 function LocalPlayer:attack()
-    Player.attack(self)
+    if self.isAlive and self.animationName ~= "polearm" then
+        self.animationName = "polearm"
+        self.aniFrame = 0
+        if self.nextHitQueued == false then
+            self.nextHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
+            self.nextHitQueued = true
+            local animation = self.sprite.animations[self.animationName]
+            local aniDuration = animation[2] * (1 / animation[3])
+            self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
+        end
+    end
 end

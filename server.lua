@@ -66,7 +66,35 @@ function Server:update()
                 end
             elseif cmd == "removeEntity" then
                 log("removeEntity "..data.nid)
-                self.networkEntities[data.nid] = nil
+                local entity = self.networkEntities[data.nid]
+                if entity ~= nil then
+                    if entity.state.type == "Player" or entity.state.type == "Enemy" or entity.state.type == "Character" then
+                        entity:despawn()
+                    end
+                    self.networkEntities[data.nid] = nil
+                else
+                    log("entity to remove was not found: nid "..data.nid)
+                end
+            elseif cmd == "hitEntity" then
+                log("hitEntity "..data.nid)
+                local entity = self.networkEntities[data.nid]
+                if entity ~= nil then
+                    if entity.state.type == "Player" or entity.state.type == "Enemy" or entity.state.type == "Character" then
+                        local source = self.networkEntities[data.sourceNid]
+                        if source ~= nil then
+                            local wasAlive = entity.isAlive
+                            entity:gotHit(source, data.damage, data.damageEffectDuration, data.knockbackDist, data.stunDuration)
+                            if source.state.type == "Player" then
+                                source:didHitEntity(entity, wasAlive and not entity.isAlive)
+                            end
+                        else
+                            log("source entity of the hit was not found: source nid "..data.sourceNid..", hit nid "..data.nid)
+                        end
+                    end
+                    self.networkEntities[data.nid] = nil
+                else
+                    log("entity to hit was not found: nid "..data.nid)
+                end
             else
                 log("unrecognised command: \""..cmd.."\"")
             end
@@ -74,6 +102,10 @@ function Server:update()
             error("Network error: "..tostring(msg))
         end
     until not bindata
+end
+function Server:attackLocation(p, r, damage, damageEffectDuration, knockbackDist, stunDuration)
+    log("attackLocation")
+    self.udp:send(binser.serialize("attackLocation", {p=p, r=r, damage=damage, damageEffectDuration=damageEffectDuration, knockbackDist=knockbackDist, stunDuration=stunDuration}))
 end
 
 function createPlayer(nid, state)

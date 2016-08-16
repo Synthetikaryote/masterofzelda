@@ -34,13 +34,7 @@ end
 function Character:update()
     self:updateCoroutines()
     if self.despawnQueued and love.timer.getTime() * timeScale >= self.despawnTime and #self.coroutines == 0 then
-        if xyMap[self.xyMapP.y] ~= nil then
-            if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
-                xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
-            end
-        end
-        characters[self.id] = nil
-        self = nil
+        self:despawn()
         return
     end
     local animation = self.sprite.animations[self.animationName]
@@ -48,6 +42,11 @@ function Character:update()
         self.aniFrame = self.aniLooping and ((self.aniFrame + 1) % animation[2]) or math.min(self.aniFrame + 1, animation[2] - 1)
         self.aniLastChange = love.timer.getTime() * timeScale
     end
+end
+function Character:despawn()
+        self:removeFromMap()
+        characters[self.id] = nil
+        self = nil
 end
 function Character:updateCoroutines()
     for i = #self.coroutines, 1, -1 do
@@ -155,11 +154,7 @@ function Character:move(p, skipCollision, slideAlongWalls)
     local x = math.floor(p.x / xyMapXWidth)
     local y = math.floor(p.y)
     if self.xyMapP.x ~= x or self.xyMapP.y ~= y then
-        if xyMap[self.xyMapP.y] ~= nil then
-            if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
-                xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
-            end
-        end
+        self:removeFromMap()
         self.xyMapP = vector(x, y)
         if xyMap[y] == nil then
             xyMap[y] = {}
@@ -168,6 +163,13 @@ function Character:move(p, skipCollision, slideAlongWalls)
             xyMap[y][x] = {}
         end
         xyMap[y][x][self.id] = self
+    end
+end
+function Character:removeFromMap()
+    if xyMap[self.xyMapP.y] ~= nil then
+        if xyMap[self.xyMapP.y][self.xyMapP.x] ~= nil then
+            xyMap[self.xyMapP.y][self.xyMapP.x][self.id] = nil
+        end
     end
 end
 function Character:gotHit(source, damage, damageEffectDuration, knockbackDist, stunDuration)

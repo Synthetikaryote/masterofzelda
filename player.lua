@@ -44,19 +44,6 @@ function Player:update()
         end
 
         if love.timer.getTime() * timeScale <= self.attackEnds then
-            if self.nextHitQueued == true and love.timer.getTime() * timeScale >= self.nextHitTime then
-                self.nextHitQueued = false
-                local animation = self.sprite.animations[self.animationName]
-                visitCharsInRadius(vector(self.state.p.x + self.attackDist * 0.3 * math.cos(self.facingDir), self.state.p.y + self.attackDist * 0.5 * math.sin(self.facingDir)), self.attackDist * 0.7, function(c)
-                    if c ~= self then
-                        local wasAlive = c.isAlive
-                        c:gotHit(self, self.attackDamage, 0.5, 90, 0.5)
-                        if wasAlive and c.state.hp <= 0 then
-                            self.killCount = self.killCount + 1
-                        end
-                    end
-                end)
-            end
         elseif self.state.moving then
             self.nextHitQueued = false
             self.animationName = "walk"
@@ -75,6 +62,8 @@ function Player:update()
     end
 
     Character.update(self)
+
+    self.state.v = vector(0, 0)
 end
 function Player:draw()
     Character.draw(self)
@@ -87,16 +76,8 @@ function Player:gamepadpressed(gamepad, button)
 end
 function Player:checkInput(scancode, button)
 end
-function Player:attack()
-    if self.isAlive and self.animationName ~= "polearm" then
-        self.animationName = "polearm"
-        self.aniFrame = 0
-        if self.nextHitQueued == false then
-            self.nextHitTime = (love.timer.getTime() + self.attackDamageTime) * timeScale
-            self.nextHitQueued = true
-        end
-        local animation = self.sprite.animations[self.animationName]
-        local aniDuration = animation[2] * (1 / animation[3])
-        self.attackEnds = (love.timer.getTime() + aniDuration) * timeScale
+function Player:didHitEntity(entity, causedDeath)
+    if causedDeath then
+        self.killCount = self.killCount + 1
     end
 end

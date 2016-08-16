@@ -47,7 +47,7 @@ showBinds = true
 local lastWheelX = 0
 local lastWheelY = 0
 local wheelButtonDuration = 0.15
-local server
+server = nil
 
 local numVisited = 0
 function love.load()
