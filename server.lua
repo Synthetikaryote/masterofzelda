@@ -42,7 +42,6 @@ function Server:update()
                 self.networkEntities[self.playerEntity.nid] = self.playerEntity
                 log("received network id "..self.playerEntity.nid)
             elseif cmd == "newEntity" then
-                log("newEntity "..data.nid)
                 local entity = nil
                 if data.state.type == "Player" then
                     entity = createPlayer(data.nid, data.state)
@@ -66,7 +65,6 @@ function Server:update()
                     end
                 end
             elseif cmd == "removeEntity" then
-                log("removeEntity "..data.nid)
                 local entity = self.networkEntities[data.nid]
                 if entity ~= nil then
                     if entity.state.type == "Player" or entity.state.type == "Enemy" or entity.state.type == "Character" then
@@ -77,7 +75,6 @@ function Server:update()
                     log("entity to remove was not found: nid "..data.nid)
                 end
             elseif cmd == "hitEntity" then
-                log("hitEntity "..data.nid)
                 local entity = self.networkEntities[data.nid]
                 if entity ~= nil then
                     if entity.state.type == "Player" or entity.state.type == "Enemy" or entity.state.type == "Character" then
@@ -92,7 +89,6 @@ function Server:update()
                             log("source entity of the hit was not found: source nid "..data.sourceNid..", hit nid "..data.nid)
                         end
                     end
-                    self.networkEntities[data.nid] = nil
                 else
                     log("entity to hit was not found: nid "..data.nid)
                 end
