@@ -279,8 +279,7 @@ end
 
 function love.draw()
 
-    --map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    map:draw(0,0,1,1)
+    map:draw(0, 0, 1, 1)
 
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
