@@ -107,7 +107,7 @@ end
 
 function Character:move(p, skipCollision, slideAlongWalls)
     local slideAlongWalls = slideAlongWalls == nil and true or false
-    local mapX, mapY = map:convertScreenToWorld(p.x, p.y)
+    local mapX, mapY = map:convertPixelToTile(p.x, p.y)
     mapX, mapY = math.floor(mapX) + 1, math.floor(mapY) + 1
 
     if not skipCollision then
@@ -123,7 +123,7 @@ function Character:move(p, skipCollision, slideAlongWalls)
         local i = 0
         repeat
             i = i + 1
-            m.x, m.y = map:convertScreenToWorld(q.x + d * n.x, q.y + d * n.y)
+            m.x, m.y = map:convertPixelToTile(q.x + d * n.x, q.y + d * n.y)
             local dx = n.x ~= 0 and ((math.floor(m.x + (n.x > 0 and 0.99 or 0)) - m.x) * tW / n.x) or dist
             local dy = n.y ~= 0 and ((math.floor(m.y + (n.y > 0 and 0.99 or 0)) - m.y) * tH / n.y) or dist
             d = d + math.min(dx, dy)

@@ -51,7 +51,7 @@ server = nil
 
 local numVisited = 0
 function love.load()
-    map = sti.new("assets/maps/savageland.lua", { })
+    map = sti("assets/maps/savageland.lua", { })
     obstacles = map.layers["level 1 obstacles"]
 
     for k, layer in pairs(map.layers) do
@@ -279,8 +279,8 @@ end
 
 function love.draw()
 
-    map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    map:draw()
+    --map:setDrawRange(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    map:draw(0,0,1,1)
 
     local joystick = love.joystick.getJoysticks()[1]
     local v = joystick and {joystick:getAxis(1), joystick:getAxis(2)} or {0, 0}
