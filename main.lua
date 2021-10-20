@@ -114,14 +114,14 @@ function love.load()
     }, {
         {310, 50}, {226, 315}, {134, 226}, {45, 134}
     })
-    local numOrcs = 0
+    local numOrcs = 1000
     for i=1,numOrcs do
         -- function Enemy:init(id, sprite,  hp,     moveSpeed,  invincibilityTime,  attackDist,     attackDamage,   attackDamageTime,   collisionDist,  detectDist, collisionDamage,    pursueDist, startAttackDist)
         local orc = Enemy("orc"..i, orcSprite,    100,    100,        0.2,          60,            20,             0.90,               10,             300,        10,                 30,         110)
         orc.scale = 1
         repeat
             orc:move(vector(math.random(0, 7680), math.random(0, 7680)))
-        until (orc.p - player.state.p):lenSq() > 400 * 400
+        until (orc.state.p - player.state.p):lenSq() > 400 * 400
         characters[orc.id] = orc
     end
 

@@ -32,8 +32,8 @@ function Enemy:update()
         shouldBaseUpdate = true
     else
         if love.timer.getTime() * timeScale >= self.stunEndTime then
-            local dx = player.p.x - self.p.x
-            local dy = player.p.y - self.p.y
+            local dx = player.state.p.x - self.state.p.x
+            local dy = player.state.p.y - self.state.p.y
             local distSq = dx * dx + dy * dy
             if distSq < self.detectDist * self.detectDist then
                 local dist = math.sqrt(distSq)
@@ -51,7 +51,7 @@ function Enemy:update()
                 if player.isAlive and dist < self.detectDist and dist >= self.pursueDist then
                     newAniName = "walk"
                     local mult = self.moveSpeed * love.timer.getDelta() * timeScale
-                    self:move(vector(self.p.x + vx * mult, self.p.y + vy * mult))
+                    self:move(vector(self.state.p.x + vx * mult, self.state.p.y + vy * mult))
                 else
                     if not player.isAlive or self.animationName ~= "attack" then
                         newAniName = "walk"
@@ -89,8 +89,8 @@ end
 function Enemy:earlyDraw()
     if showAggro then
         local animation = self.sprite.animations[self.animationName]
-        local x = mapP.x + self.p.x
-        local y = mapP.y + self.p.y
+        local x = mapP.x + self.state.p.x
+        local y = mapP.y + self.state.p.y
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.circle("line", x, y, self.detectDist, 40)
         love.graphics.setColor(255, 0, 0, 50)
