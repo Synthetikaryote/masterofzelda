@@ -2,7 +2,7 @@
 
 function love.conf(t)
 	t.identity = nil					-- The name of the save directory (string)
-	t.version = "0.10.1"				-- The LÖVE version this game was made for (string)
+	t.version = "11.3"				-- The LÖVE version this game was made for (string)
 	t.console = false					-- Attach a console (boolean, Windows only)
 
 	--t.window.title = "Untitled"		-- The window title (string)
@@ -16,7 +16,7 @@ function love.conf(t)
 	t.window.minheight = 1				-- Minimum window height if the window is resizable (number)
 	t.window.fullscreen = true			-- Enable fullscreen (boolean)
 	t.window.fullscreentype = "desktop"	-- Choose between "normal" fullscreen or "desktop" fullscreen mode (string)
-	t.window.vsync = true				-- Enable vertical sync (boolean)
+	t.window.vsync = false				-- Enable vertical sync (boolean)
 	t.window.fsaa = 0					-- The number of samples to use with multi-sampled antialiasing (number)
 	t.window.display = 1				-- Index of the monitor to show the window in (number)
 	t.window.highdpi = false			-- Enable high-dpi mode for the window on a Retina display (boolean)
